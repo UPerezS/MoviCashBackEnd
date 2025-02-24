@@ -35,7 +35,10 @@ const PersonalSchema = new Schema({
     CorreoElectronico: { 
         type: String, 
         required: true, 
-        match: /^\S+@\S+\.\S+$/ 
+        lowercase: true,
+        trim: true,
+        match: /^\S+@\S+\.\S+$/,
+        
     },
     Password: { type: String, required: true },
     Rol: { 
@@ -62,6 +65,8 @@ function arrayLimit(val) {
 }
 
 // Crear el modelo
-const Personal = mongoose.model('Personal', PersonalSchema);
+const Personal = mongoose.model('Personal', PersonalSchema, "Personal");
+
+mongoose.set("debug", true)
 
 module.exports = Personal;

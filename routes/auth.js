@@ -1,19 +1,13 @@
 const express = require("express");
-
 const router = express.Router();
 
-const { validatorRegister, validatorLogin} = require("../validators/auth.js");
-const { matchedData } = require("express-validator");
+const { validateRegister, validateLogin } = require("../middlewares/authMiddleware");
+const authController = require("../controllers/authController");
 
+// Ruta para registrar un usuario
+router.post("/register", validateRegister, authController.register);
 
-router.post("/register", validatorRegister, (req, res) =>{
-    req = matchedData(req);
-    res.send(req)
-})
+// Ruta para iniciar sesión
+router.post("/login", validateLogin, authController.login);
 
-router.post("/login", validatorLogin, (req, res) =>{
-    req = matchedData(req);
-    res.send(req)
-})
-
-module.exports = router
+module.exports = router;

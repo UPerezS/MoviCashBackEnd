@@ -3,6 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
+const authRoutes = require('./routes/auth.js'); // Importa las rutas de autenticación
+
 const app = express();
 
 //Middlewares
@@ -10,15 +12,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use(express.urlencoded({ extended: true }));
+
 //Rutas
 
-/**
- * Aqui invocamos a ras rutas
- */
+app.use('/auth', authRoutes); // Monta las rutas bajo el prefijo "/auth"
 
-app.use()
-
-
-// Exportación de la app express
 
 module.exports = app;
