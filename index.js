@@ -12,6 +12,11 @@ app.use(express.json());
 
 //Rutas
 
+/**
+ * Aqui invocamos a ras rutas
+ */
+
+app.use()
 
 
 // Exportación de la app express
