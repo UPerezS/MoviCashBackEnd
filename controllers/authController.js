@@ -1,4 +1,4 @@
-const { encript } = require("../utils/handlePassword");
+const { encript, compare } = require("../utils/handlePassword");
 const personalService = require("../services/personalService");
 
 // Registro de usuario
@@ -26,8 +26,6 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { CorreoElectronico, Password } = req.body;
-    console.log("Correo recibido:", CorreoElectronico); // Depuración
-    console.log("Contraseña recibida:", Password); // Depuración
 
     // Buscar al usuario por correo electrónico
     const personal = await personalService.getUserByEmail(CorreoElectronico);
@@ -41,7 +39,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: "Contraseña incorrecta" });
     }
 
-    res.status(200).json({ message: "Inicio de sesión exitoso", personal });
+    res.status(200).json({ message: "Inicio de sesión exitoso" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
