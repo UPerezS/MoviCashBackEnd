@@ -74,6 +74,6 @@ function arrayLimit(val) {
 // Crear el modelo
 const Personal = mongoose.model('Personal', PersonalSchema, "Personal");
 
-mongoose.set("debug", false)
+
 
 module.exports = Personal;
