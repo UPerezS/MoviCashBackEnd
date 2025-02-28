@@ -4,7 +4,7 @@ const personalService = require("../services/personalService");
 // Registro de usuario
 exports.register = async (req, res) => {
   try {
-    const { NombrePersonal, CorreoElectronico, Password } = req.body;
+    const { NombrePersonal, CorreoElectronico, Password, Rol } = req.body;
 
     // Encriptar la contraseña
     const hashedPassword = await encript(Password);
@@ -14,6 +14,7 @@ exports.register = async (req, res) => {
       NombrePersonal,
       CorreoElectronico,
       Password: hashedPassword,
+      Rol
     });
 
     res.status(201).json({ message: "Usuario registrado", personal: newPersonal });
