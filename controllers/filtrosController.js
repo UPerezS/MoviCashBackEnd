@@ -5,7 +5,7 @@ exports.getFilterUsers = async (req, res) => {
     const { rol, fechaInicio, fechaFin } = req.query; // Obtener rol, fechaInicio y fechaFin de la consulta
 
     try {
-        if (!rol && (!fechaInicio || !fechaFin)) { // Verificar si no se proporcionó un rol o un rango de fechas
+        if (!rol && !FechaCreacion) { // Verificar si no se proporcionó un rol o un rango de fechas
             return res.status(400).json({ message: "Debe proporcionar un rol o un rango de fechas." });
         }
 
@@ -15,11 +15,8 @@ exports.getFilterUsers = async (req, res) => {
             filter.Rol = rol; // Filtrar por rol
         }
 
-        if (fechaInicio && fechaFin) { // Verificar si se proporcionaron fechas
-            filter.FechaRegistro = {
-                $gte: new Date(fechaInicio),
-                $lte: new Date(fechaFin)
-            };
+        if (fecha) { // Verificar si se proporcionaron fechas
+            filter.FechaCreacion = FechaCreacion;
         }
 
         const usuarios = await Personal.find(filter); // Buscar usuarios en la base de datos
@@ -40,22 +37,26 @@ exports.getFilterUsers = async (req, res) => {
     }
 };
 
-
 // * Transaccion
 
 exports.getFilteredTransactions = async (req, res) => { 
-    const { fechaInicio, fechaFin } = req.query; // Se obtienen las fechas de inicio y fin de la consulta.
+    const { Transaccion } = req.query; // Se obtiene la fecha
     try {
-        const transacciones = await Transaccion.find({ // Se buscan las transacciones en la base de datos.
-            fecha: {
-                $gte: new Date(fechaInicio), // Mayor o igual a fechaInicio
-                $lte: new Date(fechaFin)     // Menor o igual a fechaFin
-            }
-        });
+        if (!Transaccion) { // Verificar si no se proporcionó un rol o un rango de fechas
+            return res.status(400).json({ message: "Debe proporcionar una fecha." });
+        }
+
+        let filter = {};
+
+        if (fecha) { // Verificar si se proporcionaron fechas
+            filter.Fecha = Fecha;
+        }
+
+        const transacciones = await Transaccion.find(filter);
 
         if (transacciones.length === 0) { // Se verifica si no se encontraron transacciones.
             return res.status(404).json(
-                { message: "No se encontraron transacciones en el rango de fechas especificado." }); // Se devuelve un mensaje de error si no se encontraron transacciones.
+                { message: "No se encontraron transacciones con la fecha especificada." }); // Se devuelve un mensaje de error si no se encontraron transacciones.
         }
 
         res.status(200).json({ 
@@ -64,7 +65,7 @@ exports.getFilteredTransactions = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error al obtener las transacciones:", error); // Se imprime el error en consola.
+        console.error("Error al obtener las transacciones:", error);
         res.status(500).json({ message: "Error interno del servidor." }); // Se devuelve un mensaje de error si hubo un error en el servidor.
     }
 };
