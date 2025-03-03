@@ -1,25 +1,35 @@
 const { encript, compare } = require("../utils/handlePassword");
-const personalService = require("../services/personalService");
+const userService = require("../services/userService");
 
-// Registro de usuario
+// Registro de usuario: operador / administrador
 exports.register = async (req, res) => {
   try {
-    const { NombrePersonal, CorreoElectronico, Password, Rol } = req.body;
+    const { RFC, NombrePersonal, ApPaterno, ApMaterno, Sexo, FechaNacimiento, CorreoElectronico, Password, Rol, Direccion, Telefono } = req.body;
 
-    // Encriptar la contraseña
+    if (!RFC || !NombrePersonal || !ApPaterno || !CorreoElectronico || !Password || !Rol) {
+      return res.status(400).json({ error: "Todos los campos obligatorios deben ser proporcionados." });
+    }
+
     const hashedPassword = await encript(Password);
 
-    // Crear el usuario
-    const newPersonal = await personalService.createPersonal({
+    const newUsuario = await userService.registerUser({
+      RFC,
       NombrePersonal,
+      ApPaterno,
+      ApMaterno,
+      Sexo,
+      FechaNacimiento,
       CorreoElectronico,
       Password: hashedPassword,
-      Rol
+      Rol,
+      Direccion,
+      Telefono
     });
 
-    res.status(201).json({ message: "Usuario registrado", personal: newPersonal });
+    res.status(201).json({ message: `${Rol} registrado exitosamente`, usuario: newUsuario });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error en el registro:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 };
 
@@ -29,7 +39,7 @@ exports.login = async (req, res) => {
     const { CorreoElectronico, Password } = req.body;
 
     // Buscar al usuario por correo electrónico
-    const personal = await personalService.getUserByEmail(CorreoElectronico);
+    const personal = await userService.getUserByEmail(CorreoElectronico);
     if (!personal) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
