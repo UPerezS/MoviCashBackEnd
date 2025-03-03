@@ -1,5 +1,8 @@
-const { encript, compare } = require("../utils/handlePassword");
 const userService = require("../services/userService");
+const authService = require("../services/authService"); 4
+const emailService = require("../services/emailService");
+
+const { encript, compare } = require("../utils/handlePassword");
 
 // Registro de usuario: operador / administrador
 exports.register = async (req, res) => {
@@ -38,19 +41,45 @@ exports.login = async (req, res) => {
   try {
     const { CorreoElectronico, Password } = req.body;
 
-    // Buscar al usuario por correo electrónico
-    const personal = await userService.getUserByEmail(CorreoElectronico);
-    if (!personal) {
+    const usuario = await userService.getUserByEmail(CorreoElectronico);
+    if (!usuario) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    // Comparar contraseñas
-    const isMatch = await compare(Password, personal.Password);
+    const isMatch = await compare(Password, usuario.Password);
     if (!isMatch) {
       return res.status(401).json({ error: "Contraseña incorrecta" });
     }
 
-    res.status(200).json({ message: "Inicio de sesión exitoso" });
+    // Generar código de verificación
+    const codigo = await authService.generarCodigoVerificacion(usuario._id);
+    await emailService.enviarCodigo(CorreoElectronico, codigo);
+
+    res.status(200).json({ message: "Código de verificación enviado" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Verificar código ingresado
+exports.verificarCodigoYGenerarToken = async (req, res) => {
+  try {
+    const { CorreoElectronico, code } = req.body;
+
+    const usuario = await userService.getUserByEmail(CorreoElectronico);
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    const esValido = await authService.verificarCodigo(usuario._id, code);
+    if (!esValido) {
+      return res.status(400).json({ error: "Código inválido o expirado" });
+    }
+
+    // Generar JWT ahora que el código fue validado
+    const token = authService.generarToken(usuario);
+
+    res.status(200).json({ message: "Inicio de sesión exitoso", token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
