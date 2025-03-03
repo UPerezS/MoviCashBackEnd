@@ -17,54 +17,53 @@ const TelefonoSchema = new Schema({
 });
 
 // Esquema del Personal
-const PersonalSchema = new Schema(
-    {
-        RFC: {
-            type: String,
-            required: false,
-            match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/
-        },
-        NombrePersonal: { type: String, required: false },
-        ApPaterno: { type: String, required: false },
-        ApMaterno: { type: String },
-        Sexo: {
-            type: String,
-            required: false,
-            enum: ['M', 'F', 'Otro'],
-
-        },
-        FechaNacimiento: { type: Date, required: false },
-        CorreoElectronico: {
-            type: String,
-            required: false,
-            lowercase: false,
-            trim: true,
-            match: /^\S+@\S+\.\S+$/,
-
-        },
-        Password: { type: String, required: false },
-        Rol: {
-            type: String,
-            required: false,
-            enum: ['Admin', 'Operador'],
-            default: 'Operador'
-        },
-        Direccion: { type: DireccionSchema, required: false },
-        //Telefono: { type: [TelefonoSchema], required: false, validate: [arrayLimit, '{PATH} debe tener al menos un elemento'] },
-        Estado: {
-            type: String,
-            required: false,
-            enum: ['Activo', 'Bloqueado', 'Inactivo'],
-            default: 'Inactivo'
-        },
+const PersonalSchema = new Schema({
+    RFC: {
+      type: String,
+      required: true,
+      unique: true,
+      match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/, // RFC válido
     },
-    {
-        timestamps:{
-            createdAt:'FechaCreacion',
-            updatedAt:'FechaActualizacion'
-        }
-    }
-);
+    NombrePersonal: { type: String, required: true },
+    ApPaterno: { type: String, required: true },
+    ApMaterno: { type: String },
+    Sexo: {
+      type: String,
+      required: true,
+      enum: ['M', 'F'], // Solo M o F
+    },
+    FechaNacimiento: { type: Date, required: true },
+    CorreoElectronico: {
+      type: String,
+      required: true,
+      trim: true,
+      match: /^\S+@\S+\.\S+$/, // Correo válido
+    },
+    Password: { type: String, required: true },
+    Rol: {
+      type: String,
+      required: true,
+      enum: ['Admin', 'Operador'],
+      default: 'Operador',
+    },
+    Direccion: { type: DireccionSchema, required: true },
+    Telefono: {
+      type: [TelefonoSchema],
+      required: true,
+      validate: [v => v.length > 0, 'Debe tener al menos un teléfono'],
+    },
+    Estado: {
+      type: String,
+      required: true,
+      enum: ['Activo', 'Bloqueado', 'Inactivo'],
+      default: 'Inactivo',
+    },
+  }, {
+    timestamps: {
+      createdAt: 'FechaCreacion',
+      updatedAt: 'FechaActualizacion',
+    },
+  });
 
 // Función de validación para el array de teléfonos
 function arrayLimit(val) {
@@ -74,6 +73,6 @@ function arrayLimit(val) {
 // Crear el modelo
 const Personal = mongoose.model('Personal', PersonalSchema, "Personal");
 
-mongoose.set("debug", false)
+
 
 module.exports = Personal;
