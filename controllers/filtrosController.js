@@ -2,7 +2,7 @@ const Personal = require("../models/personal");
 
 // * Filtro de usuarios
 exports.getFilterUsers = async (req, res) => {
-    const { rol, fechaInicio, fechaFin } = req.query; // Obtener rol, fechaInicio y fechaFin de la consulta
+    const { rol, FechaCreacion } = req.query; // Obtener rol, fechaInicio y fechaFin de la consulta
 
     try {
         if (!rol && !FechaCreacion) { // Verificar si no se proporcionó un rol o un rango de fechas
