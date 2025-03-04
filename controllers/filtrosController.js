@@ -1,35 +1,39 @@
 const Personal = require("../models/personal");
+const Transaccion = require("../models/transaccion");
 
 // * Filtro de usuarios
 exports.getFilterUsers = async (req, res) => {
-    const { rol, FechaCreacion } = req.query; // Obtener rol, fechaInicio y fechaFin de la consulta
-
     try {
-        if (!rol && !FechaCreacion) { // Verificar si no se proporcionó un rol o un rango de fechas
+        const { rol, FechaCreacion } = req.body; // Obtener rol y fecha
+
+        if (!rol && !FechaCreacion) {
             return res.status(400).json({ message: "Debe proporcionar un rol o un rango de fechas." });
         }
 
-        let filter = {}; // Crear objeto para filtrar
+        let filter = {}; // Objeto para filtrar
 
         if (rol) { 
             filter.Rol = rol; // Filtrar por rol
         }
 
-        if (fecha) { // Verificar si se proporcionaron fechas
-            filter.FechaCreacion = FechaCreacion;
+        if (FechaCreacion && FechaCreacion.start && FechaCreacion.end) { // Filtrar por rango de fechas
+            filter.FechaCreacion = { 
+                $gte: new Date(FechaCreacion.start), 
+                $lte: new Date(FechaCreacion.end) 
+            };
         }
 
-        const usuarios = await Personal.find(filter); // Buscar usuarios en la base de datos
+        const usuarios = await Personal.find(filter); 
 
-        if (usuarios.length === 0) { // Verificar si no se encontraron usuarios
+        if (!usuarios.length) {
             return res.status(404).json(
-                { message: "No se encontraron usuarios con los criterios especificados." });
+                { message: "No se encontraron usuarios con los criterios especificados." }); // Si no hay usuarios, se envía un error
         }
 
-        res.status(200).json({ // Devolver respuesta exitosa
+        res.status(200).json({  // Se envía la respuesta
             message: "Usuarios encontrados.",
-            data: usuarios // Devolver usuarios encontrados
-        });
+            data: usuarios 
+        }); 
 
     } catch (error) {
         console.error("Error al obtener los usuarios:", error);
@@ -37,35 +41,37 @@ exports.getFilterUsers = async (req, res) => {
     }
 };
 
-// * Transaccion
-
+// * Transacción
 exports.getFilteredTransactions = async (req, res) => { 
-    const { Transaccion } = req.query; // Se obtiene la fecha
     try {
-        if (!Transaccion) { // Verificar si no se proporcionó un rol o un rango de fechas
-            return res.status(400).json({ message: "Debe proporcionar una fecha." });
+        const { Fecha } = req.body; // Se obtiene la fecha
+
+        if (!Fecha) {
+            return res.status(400).json({ message: "Debe proporcionar una fecha." }); // Si no hay fecha, se envía un error
         }
 
-        let filter = {};
+        let filter = { Fecha: new Date(Fecha) }; // Se crea el filtro
 
-        if (fecha) { // Verificar si se proporcionaron fechas
-            filter.Fecha = Fecha;
+        if (Fecha && Fecha.start && Fecha.end) { // Filtrar por rango de fechas
+            filter.Fecha = { 
+                $gte: new Date(Fecha.start), 
+                $lte: new Date(Fecha.end) 
+            };
         }
 
-        const transacciones = await Transaccion.find(filter);
+        const transacciones = await Transaccion.find(filter); //Personal", PersonalSchema, "Personal
 
-        if (transacciones.length === 0) { // Se verifica si no se encontraron transacciones.
-            return res.status(404).json(
-                { message: "No se encontraron transacciones con la fecha especificada." }); // Se devuelve un mensaje de error si no se encontraron transacciones.
+        if (!transacciones.length) {
+            return res.status(404).json({ message: "No se encontraron transacciones con la fecha especificada." });
         }
 
         res.status(200).json({ 
-            message: "Transacciones encontradas.", // Se devuelve un mensaje de éxito si se encontraron transacciones.
+            message: "Transacciones encontradas.",
             data: transacciones
         });
 
     } catch (error) {
         console.error("Error al obtener las transacciones:", error);
-        res.status(500).json({ message: "Error interno del servidor." }); // Se devuelve un mensaje de error si hubo un error en el servidor.
+        res.status(500).json({ message: "Error interno del servidor." });
     }
-};
+}
