@@ -1,33 +1,40 @@
-const jwt = require("jsonwebtoken");
-const VerificarCodigo = require("../models/VerificarCodigo");
-const emailService = require("./emailService");
+const VerificationCode = require('../models/VerificarCodigo');
+const generarCodigo = require('../utils/handleCode');
+const { tokenSign } = require('../utils/handleJwt');
 
-// Generar JWT (solo con ID y Rol)
-const generarToken = (usuario) => {
-  return jwt.sign(
-    {
-      id: usuario._id,
-      rol: usuario.Rol,
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: "1h" }
-  );
-};
-
-// Generar código de verificación
+/**
+ * Genera un código de verificación y lo guarda en la DB
+ * @param {String} userId 
+ * @returns {String} Código generado
+ */
 const generarCodigoVerificacion = async (userId) => {
-  const codigo = Math.floor(100000 + Math.random() * 900000).toString(); // Código de 6 dígitos
-
-  // Guardar en la base de datos
-  await VerificarCodigo.create({ userId, code: codigo, expiresAt: Date.now() + 10 * 60 * 1000 }); // Expira en 10 minutos
-
-  return codigo;
+  const code = generarCodigo(6);
+  await VerificationCode.create({ userId, code });
+  return code;
 };
 
-// Verificar código de autenticación
-const verificarCodigo = async (userId, codigo) => {
-  const registro = await VerificarCodigo.findOne({ userId, code: codigo });
-  return !!registro;
+/**
+ * Verifica si el código es válido para el usuario
+ * @param {String} userId 
+ * @param {String} code 
+ * @returns {Boolean}
+ */
+const verificarCodigo = async (userId, code) => {
+  const record = await VerificationCode.findOne({ userId, code });
+  if (record) {
+    await VerificationCode.deleteOne({ _id: record._id }); // Elimina el código usado
+    return true;
+  }
+  return false;
 };
 
-module.exports = { generarToken, generarCodigoVerificacion, verificarCodigo };
+/**
+ * Genera un token JWT para el usuario
+ * @param {Object} user 
+ * @returns {String} Token firmado
+ */
+const generarToken = async (user) => {
+  return await tokenSign(user);
+};
+
+module.exports = { generarCodigoVerificacion, verificarCodigo, generarToken };

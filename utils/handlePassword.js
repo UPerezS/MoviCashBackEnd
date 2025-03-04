@@ -5,7 +5,7 @@ const bcryptjs = require("bcryptjs");
  * @param {*} passwordPlane 
  */
 
-const encript = async (passwordPlane, salt) => {
+const hash = async (passwordPlane, salt) => {
     const hash = await bcryptjs.hash(passwordPlane, 10)
 
     return hash
@@ -21,4 +21,4 @@ const compare = async (passwordPlane, hashPassword) => {
     return await bcryptjs.compare(passwordPlane, hashPassword)
 }
 
-module.exports = {encript,compare};
+module.exports = {hash,compare};
