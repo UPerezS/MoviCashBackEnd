@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
-const adminController = require("../controllers/adminController"); // Se importa el controlador para poder tener acceso a sus metodos
+const authMiddleware = require('../middlewares/authMiddleware');
+const checkRol = require('../middlewares/roleMiddleware');
+const adminController = require('../controllers/adminController');
 
 // Ruta para obtener a todos los administradores
-router.get("/getAllAdmin", adminController.getAllAdmin);
+router.get('/getAllAdmin', authMiddleware, checkRol(['Admin']), adminController.getAllAdmin);
 
 // Ruta para eliminar a un administrador
-router.delete("/deleteAdmin/:RFC", adminController.deleteAdmin);
+router.delete('/deleteAdmin/:RFC', authMiddleware, checkRol(['Admin']), adminController.deleteAdmin);
 
 // Ruta para actualizar a un administrador
-router.put("/updateAdmin/:RFC", adminController.updateAdmin);
+router.put('/updateAdmin/:RFC', authMiddleware, checkRol(['Admin']), adminController.updateAdmin);
 
-module.exports = router
+module.exports = router;

@@ -1,70 +1,78 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 // Esquema de la dirección
 const DireccionSchema = new Schema({
-  NumeroInterior: { type: String },
-  NumeroExterior: { type: String },
-  Calle: { type: String },
-  Colonia: { type: String },
-  Ciudad: { type: String }
+    NumeroInterior: { type: String },
+    NumeroExterior: { type: String, required: false },
+    Calle: { type: String, required: false },
+    Colonia: { type: String, required: false },
+    Ciudad: { type: String, required: false }
 });
 
 // Esquema del teléfono
 const TelefonoSchema = new Schema({
-  Lada: { type: String, match: /^\d{2,3}$/ }, // 2 o 3 dígitos numéricos
-  Numero: { type: String, match: /^\d{7,10}$/ } // 7 a 10 dígitos numéricos
+    Lada: { type: String, required: false, match: /^\d{2,3}$/ },
+    Numero: { type: String, required: false, match: /^\d{7,10}$/ }
 });
 
 // Esquema del Personal
-const PersonalSchema = new Schema(
-  {
+const PersonalSchema = new Schema({
     RFC: {
       type: String,
-      match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/ // Validación de RFC
+      required: true,
+      unique: true,
+      match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/, // RFC válido
     },
-    NombrePersonal: { type: String },
-    ApPaterno: { type: String },
+    NombrePersonal: { type: String, required: true },
+    ApPaterno: { type: String, required: true },
     ApMaterno: { type: String },
     Sexo: {
       type: String,
-      enum: ["M", "F", "Otro"]
+      required: true,
+      enum: ['M', 'F'], // Solo M o F
     },
-    FechaNacimiento: { type: Date },
+    FechaNacimiento: { type: Date, required: true },
     CorreoElectronico: {
       type: String,
-      lowercase: true, // Normaliza el email a minúsculas
-      trim: true, // Elimina espacios en los extremos
-      match: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/ // Validación de correo
+      required: true,
+      trim: true,
+      match: /^\S+@\S+\.\S+$/, // Correo válido
     },
-    Password: { type: String },
+    Password: { type: String, required: true },
     Rol: {
       type: String,
-      enum: ["Admin", "Operador"],
-      default: "Operador"
+      required: true,
+      enum: ['Admin', 'Operador'],
+      default: 'Operador',
     },
-    Direccion: { type: DireccionSchema },
+    Direccion: { type: DireccionSchema, required: true },
     Telefono: {
-      type: [TelefonoSchema], 
-      validate: {
-        validator: function (v) {
-          return v.length >= 1; // Debe haber al menos un teléfono
-        },
-        message: "Debe proporcionar al menos un número de teléfono."
-      }
+      type: [TelefonoSchema],
+      required: true,
+      validate: [v => v.length > 0, 'Debe tener al menos un teléfono'],
     },
     Estado: {
       type: String,
-      enum: ["Activo", "Bloqueado", "Inactivo"],
-      default: "Inactivo"
-    }
-  },
-  {
-    timestamps: { createdAt: "FechaCreacion", updatedAt: "FechaActualizacion" }
-  }
-);
+      required: true,
+      enum: ['Activo', 'Bloqueado', 'Inactivo'],
+      default: 'Inactivo',
+    },
+  }, {
+    timestamps: {
+      createdAt: 'FechaCreacion',
+      updatedAt: 'FechaActualizacion',
+    },
+  });
+
+// Función de validación para el array de teléfonos
+function arrayLimit(val) {
+    return val.length >= 1;
+}
 
 // Crear el modelo
-const Personal = mongoose.model("Personal", PersonalSchema, "Personal");
+const Personal = mongoose.model('Personal', PersonalSchema, "Personal");
+
+
 
 module.exports = Personal;
