@@ -1,17 +1,17 @@
-const { encript, compare } = require("../utils/handlePassword");
-const userService = require("../services/userService");
+const userService = require('../services/userService');
+const authService = require('../services/authService');
+const emailService = require('../services/emailService');
+const { hash, compare } = require('../utils/handlePassword');
 
-// Registro de usuario: operador / administrador
 exports.register = async (req, res) => {
   try {
     const { RFC, NombrePersonal, ApPaterno, ApMaterno, Sexo, FechaNacimiento, CorreoElectronico, Password, Rol, Direccion, Telefono } = req.body;
 
     if (!RFC || !NombrePersonal || !ApPaterno || !CorreoElectronico || !Password || !Rol) {
-      return res.status(400).json({ error: "Todos los campos obligatorios deben ser proporcionados." });
+      return res.status(400).json({ error: 'Todos los campos obligatorios deben ser proporcionados.' });
     }
 
-    const hashedPassword = await encript(Password);
-
+    const hashedPassword = await hash(Password);
     const newUsuario = await userService.registerUser({
       RFC,
       NombrePersonal,
@@ -23,35 +23,55 @@ exports.register = async (req, res) => {
       Password: hashedPassword,
       Rol,
       Direccion,
-      Telefono
+      Telefono,
     });
 
     res.status(201).json({ message: `${Rol} registrado exitosamente`, usuario: newUsuario });
   } catch (error) {
-    console.error("Error en el registro:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
 
-// Inicio de sesión
 exports.login = async (req, res) => {
   try {
     const { CorreoElectronico, Password } = req.body;
 
-    // Buscar al usuario por correo electrónico
-    const personal = await userService.getUserByEmail(CorreoElectronico);
-    if (!personal) {
-      return res.status(404).json({ error: "Usuario no encontrado" });
+    const usuario = await userService.getUserByEmail(CorreoElectronico);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    // Comparar contraseñas
-    const isMatch = await compare(Password, personal.Password);
+    const isMatch = await compare(Password, usuario.Password);
     if (!isMatch) {
-      return res.status(401).json({ error: "Contraseña incorrecta" });
+      return res.status(401).json({ error: 'Contraseña incorrecta' });
     }
 
-    res.status(200).json({ message: "Inicio de sesión exitoso" });
+    const code = await authService.generarCodigoVerificacion(usuario._id);
+    await emailService.enviarCodigo(CorreoElectronico, code);
+
+    res.status(200).json({ message: 'Código de verificación enviado' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
+exports.verificarCodigoYGenerarToken = async (req, res) => {
+  try {
+    const { CorreoElectronico, code } = req.body;
+
+    const usuario = await userService.getUserByEmail(CorreoElectronico);
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const isValid = await authService.verificarCodigo(usuario._id, code);
+    if (!isValid) {
+      return res.status(400).json({ error: 'Código inválido o expirado' });
+    }
+
+    const token = await authService.generarToken(usuario);
+    res.status(200).json({ message: 'Inicio de sesión exitoso', token });
+  } catch (error) {
+    res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
