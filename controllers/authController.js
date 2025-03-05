@@ -1,17 +1,21 @@
 const userService = require('../services/userService');
 const authService = require('../services/authService');
 const emailService = require('../services/emailService');
-const { hash, compare, generateTempPassword } = require('../utils/handlePassword');
+const { hash, compare } = require('../utils/handlePassword');
+const generateCode = require('../utils/handleCode');
 
+// Registro de usuario: operador / administrador
 exports.register = async (req, res) => {
   try {
-    const { RFC, NombrePersonal, ApPaterno, ApMaterno, Sexo, FechaNacimiento, CorreoElectronico, Password, Rol, Direccion, Telefono } = req.body;
+    const { RFC, NombrePersonal, ApPaterno, ApMaterno, Sexo, FechaNacimiento, CorreoElectronico, Rol, Direccion, Telefono } = req.body;
 
-    if (!RFC || !NombrePersonal || !ApPaterno || !CorreoElectronico || !Password || !Rol) {
-      return res.status(400).json({ error: 'Todos los campos obligatorios deben ser proporcionados.' });
+    if (!RFC || !NombrePersonal || !ApPaterno || !CorreoElectronico || !Rol) {
+      return res.status(400).json({ error: "Todos los campos obligatorios deben ser proporcionados." });
     }
 
-    const hashedPassword = await hash(Password);
+    const tempPassword = generateCode(10);
+    const hashedPassword = await hash(tempPassword);
+
     const newUsuario = await userService.registerUser({
       RFC,
       NombrePersonal,
@@ -24,7 +28,17 @@ exports.register = async (req, res) => {
       Rol,
       Direccion,
       Telefono,
+      Estado: "Inactivo", // Hasta que cambie la contraseña
     });
+
+
+    // Enviar correo con la contraseña temporal
+    try{
+      await emailService.enviarCodigo(CorreoElectronico, tempPassword);
+      console.log(`Correo enviado a: ${CorreoElectronico}`);
+      } catch (emailError) {
+        console.error(`Error al enviar el correo a ${CorreoElectronico}:`, emailError.message);
+      }
 
     res.status(201).json({ message: `${Rol} registrado exitosamente`, usuario: newUsuario });
   } catch (error) {
@@ -61,18 +75,28 @@ exports.verificarCodigoYGenerarToken = async (req, res) => {
 
     const usuario = await userService.getUserByEmail(CorreoElectronico);
     if (!usuario) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
     const isValid = await authService.verificarCodigo(usuario._id, code);
     if (!isValid) {
-      return res.status(400).json({ error: 'Código inválido o expirado' });
+      return res.status(400).json({ error: "Código inválido o expirado" });
     }
 
     const token = await authService.generarToken(usuario);
-    res.status(200).json({ message: 'Inicio de sesión exitoso', token });
+
+    // Enviar el token por correo
+    try {
+      await emailService.enviarCodigo(CorreoElectronico, `Tu token de acceso es: ${token}`);
+      console.log(`Token enviado a: ${CorreoElectronico}`);
+    } catch (emailError) {
+      console.error(`Error al enviar el token por correo:`, emailError.message);
+    }
+
+    res.status(200).json({ message: "Inicio de sesión exitoso", token });
   } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error("Error en verificarCodigoYGenerarToken:", error.message);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 };
 
