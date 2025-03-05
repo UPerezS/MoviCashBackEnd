@@ -24,12 +24,14 @@ const TransaccionSchema = new Schema({
     },
 }, {
     timestamps: {
-        createdAt: 'FechaCreacion',
-        updatedAt: 'FechaActualizacion',
+
+        createdAt: 'Fecha',
+        updatedAt: 'FechaActualizacionRespuesta',
     },
 });
 
 // Crear el modelo
 const Transaccion = mongoose.model('Transaccion', TransaccionSchema, "Transaccion");
+
 
 module.exports = Transaccion;
