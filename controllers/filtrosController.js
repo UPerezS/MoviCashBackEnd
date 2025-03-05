@@ -1,40 +1,63 @@
 const Personal = require("../models/personal");
 const Transaccion = require("../models/transaccion");
+const Ordenante = require("../models/ordenante");
+
 
 // * Filtro de usuarios
 exports.getFilterUsers = async (req, res) => {
     try {
-        const { rol, FechaCreacion } = req.body; // Obtener rol o fecha
+        const { rol, FechaCreacion, RFCOrdenante } = req.body; 
+        const myRFC = req.user ? req.user.RFC : null; 
 
-        if (!rol && !FechaCreacion) { // Si no hay rol ni fechas
+        if (!rol && !FechaCreacion && !RFCOrdenante) { 
             return res.status(400).json(
-                { message: "Debe proporcionar un rol o un rango de fechas válido." });
+                { message: "Debe proporcionar un rol, un rango de fechas válido o un RFC de ordenante." });
         }
         
         let filter = {};
 
         if (rol) { 
-            filter.Rol = rol; // Se agrega el rol al filtro
+            filter.Rol = rol;
+            if (rol === "Admin" && myRFC) {
+                filter.RFC = { $ne: myRFC }; 
+            }
         }
 
         if (FechaCreacion) { 
             if (typeof FechaCreacion === "string") {
-                filter.FechaCreacion = new Date(FechaCreacion);
+                if (FechaCreacion.includes("T")) {
+                    filter.FechaCreacion = new Date(FechaCreacion);
+                } else {
+                    const fechaInicio = new Date(`${FechaCreacion}T00:00:00.000Z`);
+                    const fechaFin = new Date(`${FechaCreacion}T23:59:59.999Z`);
+                    
+                    filter.FechaCreacion = { $gte: fechaInicio, $lte: fechaFin };
+                }
             } else {
                 return res.status(400).json({ message: "Formato de fecha inválido." });
             }
         }
 
-        const usuarios = await Personal.find(filter); 
+        let usuarios = [];
+        let ordenantes = [];
 
-        if (!usuarios.length) {
-            return res.status(404).json(
-                { message: "No se encontraron usuarios con los criterios especificados." }); // Si no hay usuarios, se envía un error
+        if (RFCOrdenante) {
+            ordenantes = await Ordenante.find({ RFCOrdenante });
+            if (!ordenantes.length) {
+                return res.status(404).json(
+                    { message: "No se encontraron ordenantes con el RFC especificado." }); 
+            }
+        } else {
+            usuarios = await Personal.find(filter);
+            if (!usuarios.length) {
+                return res.status(404).json(
+                    { message: "No se encontraron usuarios con los criterios especificados." }); 
+            }
         }
 
         res.status(200).json({
             message: "Usuarios encontrados.",
-            data: usuarios 
+            data: usuarios.length ? usuarios : ordenantes 
         }); 
 
     } catch (error) {
@@ -43,26 +66,34 @@ exports.getFilterUsers = async (req, res) => {
     }
 };
 
+
 // * Transacción
 exports.getFilterTransactions = async (req, res) => { 
     try {
         const { Fecha } = req.body; // Se obtiene la fecha
 
         if (!Fecha) {
-            return res.status(400).json({ message: "Debe proporcionar una fecha." }); // Si no hay fecha, se envía un error
+            return res.status(400).json({ message: "Debe proporcionar una fecha." });
         }
 
-        let filter = { Fecha: new Date(Fecha) }; // Se crea el filtro
+        let filter = { Fecha: new Date(Fecha) };
 
         if (Fecha) { 
             if (typeof Fecha === "string") {
-                filter.Fecha = new Date(Fecha);
+                if (Fecha.includes("T")) {
+                    filter.Fecha = new Date(Fecha);
+                } else {
+                    const fechaInicio = new Date(`${Fecha}T00:00:00.000Z`);
+                    const fechaFin = new Date(`${Fecha}T23:59:59.999Z`);
+                    
+                    filter.Fecha = { $gte: fechaInicio, $lte: fechaFin };
+                }
             } else {
                 return res.status(400).json({ message: "Formato de fecha inválido." });
             }
         }
 
-        const transacciones = await Transaccion.find(filter); // Se buscan las transacciones
+        const transacciones = await Transaccion.find(filter);
 
         if (!transacciones.length) {
             return res.status(404).json({ message: "No se encontraron transacciones con la fecha especificada." });
