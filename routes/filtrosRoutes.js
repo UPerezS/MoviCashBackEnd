@@ -6,6 +6,6 @@ const filtrosController = require("../controllers/filtrosController");
 router.post("/getFilterUsers", filtrosController.getFilterUsers);
 
 // Ruta para obtener transacciones por fecha
-router.post("/getFilterTransaction", filtrosController.getFilteredTransactions);
+router.post("/getFilterTransaction", filtrosController.getFilterTransactions);
 
 module.exports = router
