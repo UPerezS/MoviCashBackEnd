@@ -1,6 +1,5 @@
 const { body, validationResult } = require("express-validator");
 
-// Middleware para validar el registro
 exports.validateRegister = [
   body("RFC")
     .exists()
