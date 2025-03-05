@@ -4,23 +4,25 @@ const Transaccion = require("../models/transaccion");
 // * Filtro de usuarios
 exports.getFilterUsers = async (req, res) => {
     try {
-        const { rol, FechaCreacion } = req.body; // Obtener rol y fecha
+        const { rol, FechaCreacion } = req.body; // Obtener rol o fecha
 
-        if (!rol && !FechaCreacion) {
-            return res.status(400).json({ message: "Debe proporcionar un rol o un rango de fechas." });
+        if (!rol && !FechaCreacion) { // Si no hay rol ni fechas
+            return res.status(400).json(
+                { message: "Debe proporcionar un rol o un rango de fechas válido." });
         }
-
-        let filter = {}; // Objeto para filtrar
+        
+        let filter = {};
 
         if (rol) { 
-            filter.Rol = rol; // Filtrar por rol
+            filter.Rol = rol; // Se agrega el rol al filtro
         }
 
-        if (FechaCreacion && FechaCreacion.start && FechaCreacion.end) { // Filtrar por rango de fechas
-            filter.FechaCreacion = { 
-                $gte: new Date(FechaCreacion.start), 
-                $lte: new Date(FechaCreacion.end) 
-            };
+        if (FechaCreacion) { 
+            if (typeof FechaCreacion === "string") {
+                filter.FechaCreacion = new Date(FechaCreacion);
+            } else {
+                return res.status(400).json({ message: "Formato de fecha inválido." });
+            }
         }
 
         const usuarios = await Personal.find(filter); 
@@ -30,7 +32,7 @@ exports.getFilterUsers = async (req, res) => {
                 { message: "No se encontraron usuarios con los criterios especificados." }); // Si no hay usuarios, se envía un error
         }
 
-        res.status(200).json({  // Se envía la respuesta
+        res.status(200).json({
             message: "Usuarios encontrados.",
             data: usuarios 
         }); 
@@ -42,7 +44,7 @@ exports.getFilterUsers = async (req, res) => {
 };
 
 // * Transacción
-exports.getFilteredTransactions = async (req, res) => { 
+exports.getFilterTransactions = async (req, res) => { 
     try {
         const { Fecha } = req.body; // Se obtiene la fecha
 
@@ -52,14 +54,15 @@ exports.getFilteredTransactions = async (req, res) => {
 
         let filter = { Fecha: new Date(Fecha) }; // Se crea el filtro
 
-        if (Fecha && Fecha.start && Fecha.end) { // Filtrar por rango de fechas
-            filter.Fecha = { 
-                $gte: new Date(Fecha.start), 
-                $lte: new Date(Fecha.end) 
-            };
+        if (Fecha) { 
+            if (typeof Fecha === "string") {
+                filter.Fecha = new Date(Fecha);
+            } else {
+                return res.status(400).json({ message: "Formato de fecha inválido." });
+            }
         }
 
-        const transacciones = await Transaccion.find(filter); //Personal", PersonalSchema, "Personal
+        const transacciones = await Transaccion.find(filter); // Se buscan las transacciones
 
         if (!transacciones.length) {
             return res.status(404).json({ message: "No se encontraron transacciones con la fecha especificada." });
