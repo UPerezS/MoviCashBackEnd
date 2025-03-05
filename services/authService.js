@@ -20,13 +20,16 @@ const generarCodigoVerificacion = async (userId) => {
  * @returns {Boolean}
  */
 const verificarCodigo = async (userId, code) => {
+
   const record = await VerificationCode.findOne({ userId, code });
   if (record) {
     await VerificationCode.deleteOne({ _id: record._id }); // Elimina el código usado
     return true;
   }
+
   return false;
 };
+
 
 /**
  * Genera un token JWT para el usuario
