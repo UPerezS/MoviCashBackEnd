@@ -1,4 +1,6 @@
 const { body, validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 // Middleware para validar el registro
 exports.validateRegister = [
@@ -60,3 +62,4 @@ exports.validateLogin = [
     next();
   },
 ];
+

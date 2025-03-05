@@ -1,12 +1,16 @@
-const app = require('./index.js'); //Importación de la app express
+const app = require('./index.js');
+const conectarDB = require('./config/mongo.js');
 
-const conectarDB = require('./config/mongo.js'); //Importación de la conexion de la bd
+const transaccionRoutes = require('./routes/transaccionRoutes.js');
 
+// Configurar rutas
+app.use('/api/transacciones', transaccionRoutes);
+
+// Conectar a la base de datos
 conectarDB();
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 8090;
 
-
-app.listen(PORT, ()=>{
-    console.log(`Servidor corriendo en el puerto ${PORT}`)
-})
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
