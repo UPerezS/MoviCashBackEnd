@@ -19,7 +19,7 @@ const ActividadSchema = new Schema({
       NombreCompleto:{type:String},
       Rol:{
         type:String,
-        enum:["Administrador","Operador"]
+        enum:["Admin","Operador"]
       },
       Acciones:[{
         Accion: {
