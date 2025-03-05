@@ -1,11 +1,12 @@
 const bcryptjs = require("bcryptjs");
+const crypto = require("crypto");
 
 /**
  * Contraseña para encriptar
  * @param {*} passwordPlane 
  */
 
-const encript = async (passwordPlane, salt) => {
+const hash = async (passwordPlane, salt) => {
     const hash = await bcryptjs.hash(passwordPlane, 10)
 
     return hash
@@ -21,4 +22,8 @@ const compare = async (passwordPlane, hashPassword) => {
     return await bcryptjs.compare(passwordPlane, hashPassword)
 }
 
-module.exports = {encript,compare};
+const generateTempPassword = () => {
+    return crypto.randomBytes(6).toString("hex");
+};
+
+module.exports = {hash,compare, generateTempPassword};
