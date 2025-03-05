@@ -13,5 +13,9 @@ router.post("/login", validateLogin, authController.login);
 // Verificar de codigo enviado al usuario
 router.post('/verificar-codigo', authController.verificarCodigoYGenerarToken);
 
+router.post("/recover-password", authController.recoverPassword);
+
+router.post("/update-password", authController.updatePassword);
+
 
 module.exports = router;
