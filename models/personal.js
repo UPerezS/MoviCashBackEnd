@@ -21,27 +21,30 @@ const PersonalSchema = new Schema(
   {
     RFC: {
       type: String,
-      match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/ // Validación de RFC
+      match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/, // Validación de RFC
+      required: true,
+      unique: true
     },
-    NombrePersonal: { type: String },
-    ApPaterno: { type: String },
+    NombrePersonal: { type: String, required: true },
+    ApPaterno: { type: String, required: true },
     ApMaterno: { type: String },
-    Sexo: {
-      type: String,
-      enum: ["M", "F", "Otro"]
-    },
+    Sexo: { type: String, enum: ["M", "F", "Otro"] },
     FechaNacimiento: { type: Date },
     CorreoElectronico: {
       type: String,
+      required: true,
       lowercase: true, // Normaliza el email a minúsculas
       trim: true, // Elimina espacios en los extremos
       match: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/ // Validación de correo
     },
-    Password: { type: String },
+    Password: { type: String, required: true },
     Rol: {
       type: String,
-      enum: ["Admin", "Operador"],
-      default: "Operador"
+      enum: ["SuperAdmin", "Admin", "Operador"],
+      default: "Operador",
+      immutable: function () {
+        return this.Rol === "SuperAdmin";
+      } // Evita modificar el rol si es SuperAdmin
     },
     Direccion: { type: DireccionSchema },
     Telefono: {
@@ -63,6 +66,15 @@ const PersonalSchema = new Schema(
     timestamps: { createdAt: "FechaCreacion", updatedAt: "FechaActualizacion" }
   }
 );
+
+// Evitar eliminación del SuperAdmin
+PersonalSchema.pre("deleteOne", { document: true, query: false }, function (next) {
+  if (this.Rol === "SuperAdmin") {
+    const error = new Error("No se puede eliminar al SuperAdmin.");
+    return next(error);
+  }
+  next();
+});
 
 // Crear el modelo
 const Personal = mongoose.model("Personal", PersonalSchema, "Personal");
