@@ -1,6 +1,4 @@
 const Actividad = require("../models/actividad");
-const Personal = require("../models/personal");
-
 
 /**
  * 
@@ -10,7 +8,7 @@ const Personal = require("../models/personal");
  */
  const addAction = async (RFC, Rol, actionData) => {
     try {
-        let activity = await Actividad.findOne({ RFC, Rol });
+        var activity = await Actividad.findOne({ RFC, Rol });
 
         // Si el registro de actividad no se encuentra, se crea y se guardan las acciones relacionadas.
         if (!activity) {
@@ -52,4 +50,32 @@ const Personal = require("../models/personal");
     }
 };
 
-module.exports = {addAction};
+const getActivity = async(filters) => {
+    try{
+        var query = {};
+
+        //Filtramos por nombre si se proporciona
+        if(filters.nombre){
+            query.NombreCompleto = {$regex: new RegExp(filters.nombre,'i')}; //lo hacemos insensible a mayusculas y minusculas
+        }
+
+        //Filtramos por ROL si se proporciona
+        if(filters.rol){
+            query.rol = filters.Rol;
+        }
+        //Filtramos por rango de fechas
+        if(filters.fechaInicio && filters.fechaFin){
+            query.FechaCreacion = {
+                $gte: new Date(filters.fechaInicio),
+                $lte: new Date(filters.fechaFin)
+            };
+        }
+
+        return await Actividad.find(query);
+    }catch(error){
+        console.error("Error en getActivity: ", error.message);
+        throw new Error("Error al obtener actividades: "+error.message);
+    }
+}
+
+module.exports = {addAction, getActivity};
