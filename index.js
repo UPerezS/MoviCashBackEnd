@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-const authRoutes = require('./routes/auth.js'); // Importa las rutas de autenticación register, login, ect
+// const authRoutes = require('./routes/auth.js'); // Importa las rutas de autenticación register, login, ect
 
 
 const adminRoutes = require('./routes/adminRoutes.js') // Importa las rutas de admin

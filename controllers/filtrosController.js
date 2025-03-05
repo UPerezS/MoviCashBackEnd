@@ -1,13 +1,14 @@
 const Personal = require("../models/personal");
 const Transaccion = require("../models/transaccion");
 const Ordenante = require("../models/ordenante");
-
+const { verifyToken } = require("../utils/handleJwt");
 
 // * Filtro de usuarios
 exports.getFilterUsers = async (req, res) => {
     try {
         const { rol, FechaCreacion, RFCOrdenante } = req.body; 
         const myRFC = req.user ? req.user.RFC : null; 
+        const dataToken = await verifyToken(token);
 
         if (!rol && !FechaCreacion && !RFCOrdenante) { 
             return res.status(400).json(
@@ -18,8 +19,12 @@ exports.getFilterUsers = async (req, res) => {
 
         if (rol) { 
             filter.Rol = rol;
-            if (rol === "Admin" && myRFC) {
-                filter.RFC = { $ne: myRFC }; 
+            // Utilizar el datatoken para buscar administradores sin mostrar el usuario de la petición
+            if (rol === "Admin") {
+                if (dataToken.Rol !== "Admin") {
+                    return res.status(401).json({ message: "No tienes permisos para realizar esta acción." });
+                }
+                filter.RFC = { $ne: myRFC };
             }
         }
 
