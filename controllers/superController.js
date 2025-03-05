@@ -1,4 +1,4 @@
-const { encript } = require("../utils/handlePassword");
+const { hash } = require("../utils/handlePassword");
 const superService = require("../services/superService");
 
 const registerSuperAdmin = async (req, res) => {
@@ -14,8 +14,9 @@ const registerSuperAdmin = async (req, res) => {
             return res.status(403).json({ error: "El SuperAdmin ya existe y no se puede crear otro." });
         }
 
-        const hashedPassword = await encript(Password);
+        const hashedPassword = await hash(Password);
 
+        // Aquí se realiza la llamada para crear el SuperAdmin
         const superAdmin = await superService.createSuperAdmin({
             RFC,
             NombrePersonal,
@@ -27,13 +28,21 @@ const registerSuperAdmin = async (req, res) => {
             Password: hashedPassword,
             Rol: "SuperAdmin",
             Direccion,
-            Telefono
+            Telefono,
+            Estado: "Activo"
         });
 
         res.status(201).json({ message: "SuperAdmin registrado exitosamente", superAdmin });
+
     } catch (error) {
-        console.error("Error en el registro:", error);
-        res.status(500).json({ error: error.message || "Error interno del servidor" });
+        console.error(error);
+        if (error.name === 'ValidationError') {
+            // Si el error es una validación fallida, extraemos y mostramos los mensajes de error
+            const errorMessages = Object.values(error.errors).map(err => err.message);
+            res.status(400).json({ error: errorMessages });
+        } else {
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
     }
 };
 
