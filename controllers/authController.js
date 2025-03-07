@@ -51,7 +51,8 @@ exports.login = async (req, res) => {
 
     res.status(200).json({ message: 'Código de verificación enviado' });
   } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+    res.status(500).json({ error: 'Error interno del servidor'});
+    console.log(error)
   }
 };
 
