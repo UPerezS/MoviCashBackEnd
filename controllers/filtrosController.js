@@ -29,7 +29,7 @@ exports.filterUsers = async (req, res) => {
 
         console.log("ID del usuario autenticado:", myId);
 
-        const { rol, FechaCreacion, RFCOrdenante } = req.body;
+        const { rol, FechaCreacion, RFCOrdenante } = req.query;
 
         if (!rol && !FechaCreacion && !RFCOrdenante) {
             return res.status(400).json({
@@ -112,7 +112,7 @@ exports.filterTransactions = async (req, res) => {
             return res.status(404).json({ message: "Usuario no encontrado." });
         }
 
-        const { Fecha } = req.body;
+        const { Fecha } = req.query;
 
         if (!Fecha) {
             return res.status(400).json({ message: "Debe proporcionar una fecha." });

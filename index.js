@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth.js'); // Importa las rutas de autentic
 const operatorRoutes = require('./routes/operatorRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js') // Importa las rutas de admin
 const superRoutes = require('./routes/superRoutes.js');
+const activityRoutes = require('./routes/activityRoutes.js');
 
 const filtroRoutes = require('./routes/filtrosRoutes.js');
 const transaccionRoutes = require('./routes/transaccionRoutes.js')
