@@ -12,9 +12,12 @@ const superRoutes = require('./routes/superRoutes.js');
 
 const activityRoutes = require('./routes/activityRoutes.js'); // Importa las rutas de activity
 const transaccionRoutes = require('./routes/transaccionRoutes.js')
+const notificacionRoutes = require('./routes/notificacionRoutes');
 
 
 const app = express();
+
+
 
 // Middlewares
 app.use(cors());
@@ -29,6 +32,7 @@ app.use('/super', superRoutes); // Monta las rutas bajo el prefijo "/super"
 
 app.use('/transaccion',transaccionRoutes) // Monta las rutas bajo el prefijo "/transaccion"
 app.use('/activity',activityRoutes); // Monta las rutas bajo el prefijo "/activity"
+app.use('/notificacion',notificacionRoutes);
 
 
 module.exports = app;
