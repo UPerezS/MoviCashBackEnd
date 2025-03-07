@@ -24,8 +24,8 @@ const TransaccionSchema = new Schema({
     },
 }, {
     timestamps: {
-        createdAt: 'FechaCreacion',
-        updatedAt: 'FechaActualizacion',
+        createdAt: 'Fecha',
+        updatedAt: 'FechaActualizacionRespuesta',
     },
 });
 
