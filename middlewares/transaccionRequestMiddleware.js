@@ -1,8 +1,7 @@
-// middlewares/transaccionMiddleware.js
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
-// Middleware para verificar token en transacciones
+// verificar token en transacciones
 exports.verificarTokenTransaccion = async (req, res, next) => {
   try {
     // Obtener el token del encabezado de autorización
@@ -10,20 +9,30 @@ exports.verificarTokenTransaccion = async (req, res, next) => {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ 
         success: false,
-        error: 'No se proporcionó un token válido' 
+        error: 'No se proporcionó un token válido'
       });
     }
     
-    // Extraer el token
     const token = authHeader.split(' ')[1];
     
     // Verificar el token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'y91iFP@RHvUAfp*#MCFpWyB1997HNj^D3%71Jz%Y>Z:pnG2GQ+NtbyVmJwY*dg!K-u^P)p37QfrXmE7vxNJuMFZ2XoD0jCU},6id');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Buscar al usuario en la base de datos
     const db = mongoose.connection.db;
+    
+    let objectId;
+    try {
+      objectId = new mongoose.Types.ObjectId(decoded._id);
+    } catch (error) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'ID de usuario inválido en el token' 
+      });
+    }
+    
+    // Buscar usuario por _id
     const usuario = await db.collection('Personal').findOne({ 
-      RFC: decoded.RFC,
+      _id: objectId,
       Estado: 'Activo'
     });
     
@@ -58,13 +67,13 @@ exports.verificarTokenTransaccion = async (req, res, next) => {
   }
 };
 
-// Middleware para verificar que es un operador
+// verificar que es un operador
 exports.esOperadorTransaccion = (req, res, next) => {
   if (req.user && req.user.Rol === 'Operador') {
     return next();
   }
   return res.status(403).json({ 
-    success: false, 
+    success: false,
     error: 'Acceso denegado. Se requiere rol de operador para gestionar transacciones' 
   });
 };
