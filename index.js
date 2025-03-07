@@ -5,8 +5,12 @@ const cors = require('cors');
 
 const authRoutes = require('./routes/auth.js'); // Importa las rutas de autenticación register, login, ect
 const adminRoutes = require('./routes/adminRoutes.js') // Importa las rutas de admin
-const operatorRoutes = require('./routes/operatorRoutes.js'); // Importa las rutas de operador
-const activityRoutes = require('./routes/activityRoutes.js'); // Importa las rutas de activity
+const superRoutes = require('./routes/superRoutes.js');
+const activityRoutes = require('./routes/activityRoutes.js');
+
+const filtroRoutes = require('./routes/filtrosRoutes.js');
+const transaccionRoutes = require('./routes/transaccionRoutes.js')
+
 
 const app = express();
 
