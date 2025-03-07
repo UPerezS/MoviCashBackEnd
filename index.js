@@ -14,9 +14,12 @@ const activityRoutes = require('./routes/activityRoutes.js');
 
 const filtroRoutes = require('./routes/filtrosRoutes.js');
 const transaccionRoutes = require('./routes/transaccionRoutes.js')
+const notificacionRoutes = require('./routes/notificacionRoutes');
 
 
 const app = express();
+
+
 
 // Middlewares
 app.use(cors());
@@ -31,6 +34,7 @@ app.use('/super', superRoutes); // Monta las rutas bajo el prefijo "/super"
 
 app.use('/transaccion',transaccionRoutes) // Monta las rutas bajo el prefijo "/transaccion"
 app.use('/activity',activityRoutes); // Monta las rutas bajo el prefijo "/activity"
+app.use('/notificacion',notificacionRoutes);
 
 app.use('/auth', authRoutes); // Monta las rutas bajo el prefijo "/auth"
 app.use('/filtros', filtroRoutes); // Monta las rutas bajo el prefijo "/filtros"

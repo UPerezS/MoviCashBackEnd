@@ -1,5 +1,6 @@
 const Transaccion = require("../models/transaccion");
 const Ordenante = require("../models/ordenante");
+const Notificacion = require("../services/notificacionService");
 
 
 // Actualizar el estado de una transacción- Rechazar o aceptar transacción 
@@ -44,11 +45,17 @@ exports.updateEstadoTransaccion = async (req, res) => {
         }
 
         await transaccion.save();
-   
 
-res.status(200).json({ message: `Transacción ${accion} con éxito.`, data: transaccion });
+  // Guardar notificación pendiente para el operador
+  const mensaje = `La transacción ${transaccion.IdComprobante} se ha  ${transaccion.Estado}.`;
+
+  // Guardar la notificación en MongoDB (en caso de que el operador no esté conectado)
+ Notificacion.guardarNotificacion(transaccion.RFCOperador, mensaje, transaccion.IdComprobante);
+
+  res.status(200).json({ message: `Transacción ${accion} con éxito.`, data: transaccion });
 } catch (error) {
-console.error("Error al actualizar la transacción: ", error);
-res.status(500).json({ message: "Error interno del servidor." });
+  console.error("Error al actualizar la transacción: ", error);
+  res.status(500).json({ message: "Error interno del servidor." });
 }
+
 };

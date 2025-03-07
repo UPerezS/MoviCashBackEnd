@@ -4,93 +4,93 @@ const {Schema} =mongoose;
 const OrdenanteSchema = new Schema({
     RFCOrdenante: {
         type:String,
-        required:true,
-        unique:true,
+        required:false,
+        unique:false,
         match:/^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/
     },
     NombreOrdenante: {
         type:String,
-        required:true
+        required:false
     },
     ApPaterno: {
         type:String,
-        required:true
+        required:false
     },
     ApMaterno: {
         type:String
     },
     Sexo: {
         type:String,
-        required:true,
+        required:false,
         enum:['M','F']
     },
     FechaNacimiento: {
         type:Date,
-        required:true
+        required:false
     },
     NumeroCuenta: {
         type:String,
-        required:true
+        required:false
     },
     Saldo: {
         type:Number,
-        required:true
+        required:false
     },
     Estado: {
         type:String,
-        required:true,
+        required:false,
         enum:['Activo','Inactivo'],
         default:'Activo'
     },
     FechaRegistro: {
         type:Date,
-        required:true
+        required:false
     },
     RFCOperador: {
         type:String,
-        required:true
+        required:false
     },
     Telefono: {
         type:[{
             Lada: {
                 type:String,
-                required:true,
+                required:false,
                 match:/^\d{2,3}$/
             },
             Numero: {
                 type:String,
-                required:true,
+                required:false,
                 match:/^\d{7,10}$/
             }
         }],
-        required:true,
+        required:false,
         validate:[v=>v.length>0,'Debe tener al menos un teléfono']
     },
     Direccion: {
         NumeroInterior: {
             type:String,
-            required:true
+            required:false
         },
         NumeroExterior: {
             type:String,
-            required:true
+            required:false
         },
         Calle: {
             type:String,
-            required:true
+            required:false
         },
         Colonia: {
             type:String,
-            required:true
+            required:false
         },
         Ciudad: {
             type:String,
-            required:true
+            required:false
         }
     },
     FechaUltimaModificacion: {
         type:Date,
-        required:true
+        required:false
     },
 });
 
