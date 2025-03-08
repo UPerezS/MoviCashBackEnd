@@ -4,6 +4,6 @@ const superController = require("../controllers/superController");
 
 router.post("/register", superController.registerSuperAdmin);
 router.get("/", superController.getSuperAdmin);
-router.put("/:id", superController.updateSuperAdmin); // Nueva ruta para actualizar el superadmin
+router.put("/:id", superController.updateSuperAdmin);
 
 module.exports = router;

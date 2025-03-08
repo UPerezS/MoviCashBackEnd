@@ -21,20 +21,20 @@ const PersonalSchema = new Schema({
     RFC: {
       type: String,
       match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/, // Validación de RFC
-      required: true,
-      unique: true
+      unique: true,
+      match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/ // Validación de RFC
     },
     NombrePersonal: { type: String, required: true },
     ApPaterno: { type: String, required: true },
     ApMaterno: { type: String },
-    Sexo: { type: String, enum: ["M", "F", "Otro"] },
-    FechaNacimiento: { type: Date },
+    Sexo: { type: String, enum: ["M", "F", "Otro"], required: true },
+    FechaNacimiento: { type: Date, required: true },
     CorreoElectronico: {
       type: String,
       required: true,
       lowercase: true, // Normaliza el email a minúsculas
       trim: true, // Elimina espacios en los extremos
-      match: /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/ // Validación de correo
+      match: /^\S+@\S+\.\S+$/ // Validación de correo
     },
     Password: { type: String, required: true },
     Rol: {
@@ -49,25 +49,29 @@ const PersonalSchema = new Schema({
     Telefono: {
       type: [TelefonoSchema],
       required: true,
-      validate: [v => v.length > 0, 'Debe tener al menos un teléfono'],
+      validate: [v => v.length > 0, 'Debe tener al menos un teléfono']
     },
     Estado: {
       type: String,
       required: true,
-      enum: ['Activo', 'Bloqueado', 'Inactivo'],
-      default: 'Inactivo',
-    },
+      enum: ["Activo", "Bloqueado", "Inactivo"],
+      default: "Inactivo"
+    }
   }, {
     timestamps: {
-      createdAt: 'FechaCreacion',
-      updatedAt: 'FechaActualizacion',
-    },
+      createdAt: "FechaCreacion",
+      updatedAt: "FechaActualizacion"
+    }
   });
 
-// Función de validación para el array de teléfonos
-function arrayLimit(val) {
-    return val.length >= 1;
-}
+// Evitar eliminación del SuperAdmin
+PersonalSchema.pre("deleteOne", { document: true, query: false }, function (next) {
+  if (this.Rol === "SuperAdmin") {
+    const error = new Error("No se puede eliminar al SuperAdmin.");
+    return next(error);
+  }
+  next();
+});
 
 // Evitar eliminación del SuperAdmin
 PersonalSchema.pre("deleteOne", { document: true, query: false }, function (next) {
@@ -79,6 +83,7 @@ PersonalSchema.pre("deleteOne", { document: true, query: false }, function (next
 });
 
 // Crear el modelo
-const Personal = mongoose.model('Personal', PersonalSchema, "Personal");
+
+const Personal = mongoose.model("Personal", PersonalSchema, "Personal");
 
 module.exports = Personal;
