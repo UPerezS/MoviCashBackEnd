@@ -93,30 +93,23 @@ exports.getTransaccionesPorEstado = async (estado) => {
 };
 
 // Notificar a operadores (modificado para usar el modelo de notificaciones si lo tienes)
+
 exports.notificarOperadores = async (operadores, transaccion) => {
+  // Importar el servicio de notificaciones
+  const notificacionService = require('../services/notificacionService');
+  
   if (operadores && operadores.length > 0) {
-    console.log(`========== NOTIFICACIÓN A ${operadores.length} OPERADORES ==========`);
+    // Determinar si el monto debe ser ocultado (> 20,000)
+    const montoMostrado = transaccion.Monto > 20000 ? "MONTO CONFIDENCIAL" : transaccion.Monto;
     
-    const montoMostrado = ocultarMonto(transaccion.Monto);
-    
-    // Si tienes un servicio de notificaciones, lo usarías aquí
-    // const notificacionService = require('./notificacionService');
-    // await notificacionService.notificarNuevaTransaccion(operadores, transaccion);
-    
+    // Crear notificaciones para cada operador
     for (const operador of operadores) {
-      console.log(`Para: ${operador.NombrePersonal} ${operador.ApPaterno} (${operador.CorreoElectronico})`);
-      console.log('Nueva solicitud de transacción pendiente de aprobación');
-      console.log(`ID: ${transaccion._id}`);
-      console.log(`Comprobante: ${transaccion.IdComprobante}`);
-      console.log(`Solicitante: ${transaccion.NombreCompletoOperador}`);
-      console.log(`De: ${transaccion.NombreCompletoOrdenante} (${transaccion.NumeroCuentaOrdenante})`);
-      console.log(`Para: ${transaccion.NombreCompletoBeneficiario} (${transaccion.NumeroCuentaBeneficiario})`);
-      console.log(`Monto: ${montoMostrado}`);
-      console.log(`Concepto: ${transaccion.Concepto}`);
+      const mensaje = `Nueva solicitud de transacción ${transaccion.IdComprobante} de ${transaccion.NombreCompletoOrdenante} a ${transaccion.NombreCompletoBeneficiario} por ${montoMostrado}.`;
+      
+      // Usar la función de notificación existente
+      await notificacionService.guardarNotificacion(operador.RFC, mensaje, transaccion._id);
     }
     
-    console.log('==============================================');
-  } else {
-    console.log('No se encontraron otros operadores para notificar');
+    console.log(`Se enviaron notificaciones a ${operadores.length} operadores sobre la transacción ${transaccion.IdComprobante}`);
   }
 };

@@ -1,8 +1,9 @@
 const userService = require('../services/userService');
 const authService = require('../services/authService');
 const emailService = require('../services/emailService');
-const { hash, compare } = require('../utils/handlePassword');
+const { hash, compare, generateTempPassword } = require('../utils/handlePassword');
 const generateCode = require('../utils/handleCode');
+
 
 // Registro de usuario: operador / administrador
 exports.register = async (req, res) => {
@@ -66,6 +67,7 @@ exports.login = async (req, res) => {
     res.status(200).json({ message: 'Código de verificación enviado' });
   } catch (error) {
     res.status(500).json({ error: 'Error interno del servidor' });
+    
   }
 };
 
@@ -121,7 +123,7 @@ exports.recoverPassword = async (req, res) => {
   }
 };
 
-// Actualizar contraseña 
+// Actualizar contraseña
 exports.updatePassword = async (req, res) => {
   try {
     const { CorreoElectronico, tempPassword, newPassword } = req.body;
