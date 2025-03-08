@@ -1,39 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-<<<<<<< HEAD
-const OrdenanteSchema = new mongoose.Schema({
-    RFCOrdenante: { 
-        type: String, 
-        required: true, 
-        unique: true, 
-        match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/ 
-    },
-    NombreOrdenante: { type: String, required: true },
-    ApPaterno: { type: String, required: true },
-    ApMaterno: { type: String },
-    Sexo: { type: String, required: true, enum: ["M", "F"] },
-    FechaNacimiento: { type: Date, required: true },
-    NumeroCuenta: { type: String, required: true, unique: true },
-    Saldo: { type: Number, required: true, min: 0 },
-    Estado: { type: String, required: true, enum: ["Activo", "Inactivo", "Bloqueado"] },
-    FechaRegistro: { type: Date, default: Date.now },
-    RFCOperador: { type: String, required: true },
-    Telefono: { 
-        type: [String], 
-        required: true, 
-        validate: {
-            validator: (arr) => arr.every(num => /^\d{7,10}$/.test(num)), 
-            message: "Cada número debe tener entre 7 y 10 dígitos."
-        }
-    },
-    Direccion: {
-        NumeroInterior: { type: String },
-        NumeroExterior: { type: String, required: true },
-        Calle: { type: String, required: true },
-        Colonia: { type: String, required: true },
-        Ciudad: { type: String, required: true }
-=======
 const OrdenanteSchema = new Schema({
     RFCOrdenante: {
         type:String,
@@ -124,7 +91,6 @@ const OrdenanteSchema = new Schema({
     FechaUltimaModificacion: {
         type:Date,
         required:false
->>>>>>> 9415fb7 (test/Añadir envio de notificaciones al Operador que solicito que se aceptra la transacción para que se informe si la transacción fue Aceptada o Rechazada)
     },
     FechaUltimaModificacion: { type: Date, default: Date.now }
 });

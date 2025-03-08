@@ -24,7 +24,6 @@ app.use(express.urlencoded({ extended: true }));
 
 //Rutas
 app.use('/auth', authRoutes); // Monta las rutas bajo el prefijo "/auth"
-app.use('/operator', operatorRoutes); // Monta las rutas bajo el prefijo "/operator"
 app.use('/admin', adminRoutes); // Monta las rutas bajo el prefijo "/admin"
 app.use('/super', superRoutes); // Monta las rutas bajo el prefijo "/super"
 
