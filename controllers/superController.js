@@ -11,7 +11,7 @@ const registerSuperAdmin = async (req, res) => {
 
         const existingSuperAdmin = await superService.getSuperAdmin();
         if (existingSuperAdmin) {
-            return res.status(403).json({ error: "El superadmin ya existe y no puede ser modificado o eliminado." });
+            return res.status(403).json({ error: "El SuperAdmin ya existe y no se puede crear otro." });
         }
 
         const hashedPassword = await encript(Password);
@@ -25,15 +25,15 @@ const registerSuperAdmin = async (req, res) => {
             FechaNacimiento,
             CorreoElectronico,
             Password: hashedPassword,
-            Rol: "superadmin",
+            Rol: "SuperAdmin",
             Direccion,
             Telefono
         });
 
-        res.status(201).json({ message: "Superadmin registrado exitosamente", superAdmin });
+        res.status(201).json({ message: "SuperAdmin registrado exitosamente", superAdmin });
     } catch (error) {
         console.error("Error en el registro:", error);
-        res.status(500).json({ error: "Error interno del servidor" });
+        res.status(500).json({ error: error.message || "Error interno del servidor" });
     }
 };
 
@@ -45,9 +45,27 @@ const getSuperAdmin = async (req, res) => {
         }
         res.status(200).json(superAdmin);
     } catch (error) {
-        console.error("Error al obtener el superadmin:", error);
+        console.error("Error al obtener el SuperAdmin:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 };
 
-module.exports = { registerSuperAdmin, getSuperAdmin };
+// Ruta para actualizar el SuperAdmin, pero sin permitir cambiar el rol
+const updateSuperAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+
+        if (updateData.Rol && updateData.Rol !== "SuperAdmin") {
+            return res.status(403).json({ error: "No se puede cambiar el rol del SuperAdmin." });
+        }
+
+        const updatedSuperAdmin = await superService.updateSuperAdmin(id, updateData);
+        res.status(200).json({ message: "Superadmin actualizado con éxito", updatedSuperAdmin });
+    } catch (error) {
+        console.error("Error al actualizar el SuperAdmin:", error);
+        res.status(500).json({ error: error.message || "Error interno del servidor" });
+    }
+};
+
+module.exports = { registerSuperAdmin, getSuperAdmin, updateSuperAdmin };
