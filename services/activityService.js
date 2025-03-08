@@ -6,6 +6,7 @@ const Actividad = require("../models/actividad");
  en caso de que aun no se cuente con un registro de acciones,
  el sistema la crea automaticamente y registra las acciones.
  */
+
  const addAction = async (RFC, Rol, actionData) => {
     try {
         var activity = await Actividad.findOne({ RFC, Rol });
@@ -61,7 +62,7 @@ const getActivity = async(filters) => {
 
         //Filtramos por ROL si se proporciona
         if(filters.rol){
-            query.rol = filters.Rol;
+            query.Rol = filters.rol;
         }
         //Filtramos por rango de fechas
         if(filters.fechaInicio && filters.fechaFin){

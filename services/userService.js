@@ -30,3 +30,16 @@ exports.getUserByEmail = async (email) => {
     return user;
   };
   
+ // Actualizar la contraseña del usuario
+exports.updateUserPassword = async (email, newPassword) => {
+    try {
+      const result = await Personal.updateOne(
+        { CorreoElectronico: email },
+        { $set: { Password: newPassword, Estado: "Activo" } }
+      );
+  
+      return result;
+    } catch (error) {
+      throw new Error("Error al actualizar la contraseña: " + error.message);
+    }
+  };
