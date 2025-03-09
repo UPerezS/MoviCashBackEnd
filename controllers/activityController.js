@@ -33,7 +33,7 @@ const getActivity = async (req,res) => {
         res.json(activity);
     }catch(error){
         console.error('Error al obtener las actividades: ',error);
-        res.status(500).json({error : 'Error en el servidor'});
+        res.status(500).json({error : 'Error interno del servidor'});
     }
 };
 
