@@ -2,12 +2,15 @@ const express = require('express');
 const router = express.Router();
 
 // Se importa el controlador para poder tener acceso a sus metodos
-const operadorController = require("../controllers/ordenanteController");
+const ordenanteController = require("../controllers/ordenanteController");
+const { validateRegisterOrdenante } = require("../middlewares/ordenanteMiddleware");
 
-router.get("/getAllOrdenantes", operadorController.getAllOrdenantes);
+router.get("/getAllOrdenantes", ordenanteController.getAllOrdenantes); // ✅ Importación correcta
 
-router.delete("/deleteOrdenante/:RFCOrdenante", operadorController.deleteOrdenante);
+router.delete("/deleteOrdenante/:RFCOrdenante", ordenanteController.deleteOrdenante); // ✅ Importación correcta
 
-router.put("/updateOrdenante/:RFCOrdenante", operadorController.updateOrdenante);
+router.post("/createOrdenante", validateRegisterOrdenante ,ordenanteController.createOrdenante); // ✅ Importación correcta
+
+router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante);
 
 module.exports = router;
