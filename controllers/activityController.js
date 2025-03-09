@@ -26,8 +26,8 @@ const registerActivity = async (req,res)=>{
 
 const getActivity = async (req,res) => {
     try {
-        const { nombre, rol, fechaInicio, fechaFin} = req.query;
-        const filters = {nombre, rol, fechaInicio, fechaFin};
+        const { nombre, rol, fechaInicio, fechaFin, accion} = req.query;
+        const filters = {nombre, rol, fechaInicio, fechaFin, accion};
 
         const activity = await activityService.getActivity(filters);
         res.json(activity);
@@ -40,4 +40,3 @@ const getActivity = async (req,res) => {
 
 //Exportamos los modulos de registros
 module.exports = {registerActivity, getActivity};
-
