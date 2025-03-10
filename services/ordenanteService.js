@@ -57,11 +57,9 @@ exports.getAllOrdenantes = async (req, res) => {
 
 // Crear un nuevo ordenante
 
-exports.createOrdenante = async (req, res) => {
-    const ordenanteData = req.body;
-
+exports.createOrdenante = async (dataOrdenete) => {
     try {
-        const newOrdenante = new Ordenante(ordenanteData);
+        const newOrdenante = new Ordenante(dataOrdenete);
         await newOrdenante.save();
 
         res.status(201).json({ message: "Ordenante creado con éxito.", data: newOrdenante });
@@ -122,13 +120,3 @@ exports.updateOrdenante = async (req, res) => {
     }
 };
 
-// Exportar los métodos del controlador
-
-module.exports = {
-    getOrdenanteByRFC,
-    getOrdenanteByName,
-    getAllOrdenantes,
-    createOrdenante,
-    deleteOrdenante,
-    updateOrdenante
-};  // Se exportan los métodos para poder ser utilizados en las rutas

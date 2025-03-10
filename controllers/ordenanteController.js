@@ -1,9 +1,11 @@
 const Ordenante = require("../models/ordenante");
+const matchedData = require('express-validator');
+const ordenanteservice = require('../services/ordenanteService');
 
 // Obtener todos los ordenantes
 exports.getAllOrdenantes = async (req, res) => {
     try {
-        const ordenantes = await Ordenante.find({ Rol: "Ordenante" });
+        const ordenantes = await Ordenante.find();
         
         if (ordenantes.length === 0) {
             return res.status(404).json({ message: "No se encontraron ordenantes." });
@@ -16,7 +18,32 @@ exports.getAllOrdenantes = async (req, res) => {
         res.status(500).json({ message: "Error interno del servidor." });
     }
 };
+//crear nuevo ordenante
 
+exports.createOrdenante = async (req, res) => {
+    try {
+    
+        const body = matchedData(req);
+    
+        // Verificar si el RFC ya existe
+        const existeOrdenante = await Ordenante.findOne({ RFC });
+        if (existeOrdenante) {
+            return res.status(400).json({ message: "El RFC ya está registrado." });
+        }
+
+        const newOrdenente = await ordenanteservice.createOrdenante(body);
+
+        // Responder con éxito
+        res.status(201).json({
+            message: "Ordenante registrado exitosamente",
+            data: nuevoOrdenante,
+            newOrdenente
+        });
+    } catch (error) {
+        console.error("Error al crear el ordenante: ", error);
+        res.status(500).json({ message: "Error interno del servidor." });
+    }
+};
 // Eliminar un ordenante
 exports.deleteOrdenante = async (req, res) => {
     const { RFCOrdenante } = req.params;  // Obtenemos el RFC del ordenante desde los parámetros de la ruta
@@ -66,7 +93,6 @@ exports.updateOrdenante = async (req, res) => {
                 Saldo,
                 Estado,
                 FechaRegistro,
-                RFCOperador,
                 Telefono,
                 Direccion
             } = req.body;

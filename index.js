@@ -12,7 +12,7 @@ const superRoutes = require('./routes/superRoutes.js');
 
 const activityRoutes = require('./routes/activityRoutes.js'); // Importa las rutas de activity
 const transaccionRoutes = require('./routes/transaccionRoutes.js')
-
+const ordenateRoutes = require('./routes/ordenanteRoutes.js') // Importa las rutas de ordenante
 
 const app = express();
 
@@ -29,6 +29,6 @@ app.use('/super', superRoutes); // Monta las rutas bajo el prefijo "/super"
 
 app.use('/transaccion',transaccionRoutes) // Monta las rutas bajo el prefijo "/transaccion"
 app.use('/activity',activityRoutes); // Monta las rutas bajo el prefijo "/activity"
-
+app.use('/ordenante', ordenateRoutes); // Monta las rutas bajo el prefijo "/ordenante"
 
 module.exports = app;
