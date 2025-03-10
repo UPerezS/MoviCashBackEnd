@@ -2,6 +2,45 @@ const Ordenante = require("../models/ordenante");
 const { matchedData } = require("express-validator"); // ✅ Importación correcta
 const OrdenanteService = require('../services/ordenanteService'); // Importar el servicio
 
+// Obtener ordenante por el RFC ✅
+exports.getOrdenanteByRFC = async (req, res) => {
+    const { RFCOrdenante } = req.params; // Obtenemos el RFC del ordenante desde los parámetros de la URL
+
+    try {
+        // Buscamos el ordenante por su RFC
+        const ordenante = await Ordenante.findOne({ RFCOrdenante });
+
+        // Si no se encuentra el ordenante, respondemos con un mensaje adecuado
+        if (!ordenante) {
+            return res.status(404).json({ message: "Ordenante no encontrado." });
+        }
+
+        // Si se encuentra el ordenante, lo retornamos con un mensaje de éxito
+        return res.status(200).json({ message: "Ordenante encontrado.", data: ordenante });
+
+    } catch (error) {
+        // En caso de error, se captura y se responde con el mensaje de error
+        console.error("Error al obtener el ordenante: ", error);
+        return res.status(500).json({ message: "Error interno del servidor." });
+    }
+}
+
+// Obtener ordenante por el apellido ✅
+exports.getOrdenanteByApellido = async (req, res) => {
+    const { ApPaterno } = req.query; // Obtenemos el apellido del ordenante desde los parámetros de la URL
+
+    try {
+       
+        const usuario = await  OrdenanteService.getOrdenanteByApellido(ApPaterno);
+       
+        return res.status(200).json({ message: "Ordenante encontrado.", data: usuario });
+
+    } catch (error) {
+        // En caso de error, se captura y se responde con el mensaje de error
+        console.error("Error al obtener el ordenante: ", error);
+        return res.status(500).json({ message: "Error interno del servidor." });
+    }
+}
 
 // Obtener todos los ordenantes ✅
 exports.getAllOrdenantes = async (req, res) => {

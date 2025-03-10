@@ -15,14 +15,14 @@ exports.getOrdenanteByRFC = async (RFCOrdenante) => {
     }
 };
 
-// Obtener ordenante por el nombre
-exports.getOrdenanteByName = async (NombreOrdenante) => {
+// Obtener ordenante por el apellido
+exports.getOrdenanteByApellido = async (userData) => {
     try {
-        const ordenante = await Ordenante.findOne({ NombreOrdenante });
+        const ordenante = await Ordenante.findOne({ ApPaterno: {$eq:userData.ApPaterno} });
         if (!ordenante) {
             return { message: "Ordenante no encontrado." };
         }
-        return { message: "Ordenante encontrado.", data: ordenante };
+        return ordenante;
     } catch (error) {
         console.error("Error al obtener el ordenante: ", error);
         return { message: "Error interno del servidor." };

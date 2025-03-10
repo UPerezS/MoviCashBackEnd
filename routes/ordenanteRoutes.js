@@ -7,10 +7,14 @@ const { validateRegisterOrdenante } = require("../middlewares/ordenanteMiddlewar
 
 router.get("/getAllOrdenantes", ordenanteController.getAllOrdenantes); // ✅ Importación correcta
 
+router.get("/getOrdenanteByRFC/:RFCOrdenante", ordenanteController.getOrdenanteByRFC); // Obtener ordenante por RFC
+
+router.get("/getOrdenanteByApellido", ordenanteController.getOrdenanteByApellido); // Obtener Ordenante por Apellido
+
 router.delete("/deleteOrdenante/:RFCOrdenante", ordenanteController.deleteOrdenante); // ✅ Importación correcta
 
 router.post("/createOrdenante", validateRegisterOrdenante ,ordenanteController.createOrdenante); // ✅ Importación correcta
 
-router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante);
+router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante); // ✅ Importación correcta
 
 module.exports = router;
