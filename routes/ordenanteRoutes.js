@@ -5,16 +5,16 @@ const router = express.Router();
 const ordenanteController = require("../controllers/ordenanteController");
 const { validateRegisterOrdenante } = require("../middlewares/ordenanteMiddleware");
 
-router.get("/getAllOrdenantes", ordenanteController.getAllOrdenantes); // ✅ Importación correcta
+router.get("/getAllOrdenantes", ordenanteController.getAllOrdenantes);
 
-router.get("/getOrdenanteByRFC/:RFCOrdenante", ordenanteController.getOrdenanteByRFC); // Obtener ordenante por RFC
+router.get("/getOrdenanteByRFC/:RFCOrdenante", ordenanteController.getOrdenanteByRFC);
 
-router.get("/getOrdenanteByApellido", ordenanteController.getOrdenanteByApellido); // Obtener Ordenante por Apellido
+router.get("/getOrdenanteByApellido/:ApPaterno", ordenanteController.getOrdenanteByApellido);
 
-router.delete("/deleteOrdenante/:RFCOrdenante", ordenanteController.deleteOrdenante); // ✅ Importación correcta
+router.delete("/deleteOrdenante/:RFCOrdenante", ordenanteController.deleteOrdenante);
 
-router.post("/createOrdenante", validateRegisterOrdenante ,ordenanteController.createOrdenante); // ✅ Importación correcta
+router.post("/createOrdenante", validateRegisterOrdenante ,ordenanteController.createOrdenante);
 
-router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante); // ✅ Importación correcta
+router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante);
 
 module.exports = router;

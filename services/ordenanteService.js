@@ -15,19 +15,19 @@ exports.getOrdenanteByRFC = async (RFCOrdenante) => {
     }
 };
 
-// Obtener ordenante por el apellido
-exports.getOrdenanteByApellido = async (userData) => {
+// Obtener ordenante por el Apellido
+exports.getOrdenanteByApellido = async (ApPaterno) => {
     try {
-        const ordenante = await Ordenante.findOne({ ApPaterno: {$eq:userData.ApPaterno} });
+        const ordenante = await Ordenante.find({ ApPaterno });
         if (!ordenante) {
             return { message: "Ordenante no encontrado." };
         }
-        return ordenante;
+        return { message: "Ordenante(s) encontrado(s).", data: ordenante };
     } catch (error) {
         console.error("Error al obtener el ordenante: ", error);
         return { message: "Error interno del servidor." };
     }
-};
+}
 
 // Obtener todos los ordenantes
 exports.getAllOrdenantes = async () => {
@@ -57,10 +57,9 @@ exports.createOrdenante = async (ordenanteData) => {
 
 // Eliminar un ordenante
 exports.deleteOrdenante = async (req, res) => {
-    const { RFCOrdenante } = req.params;  // Obtenemos el RFC del ordenante desde los parámetros de la URL
+    const { RFCOrdenante } = req.params;
 
     try {
-        // Buscamos el ordenante por su RFC
         const ordenante = await Ordenante.findOne({ RFCOrdenante });
 
         if (!ordenante) {
@@ -72,7 +71,6 @@ exports.deleteOrdenante = async (req, res) => {
         return res.status(200).json({ message: "Ordenante eliminado correctamente." });
 
     } catch (error) {
-        // En caso de error, se captura y se responde con el mensaje de error
         console.error("Error al eliminar el ordenante: ", error);
         return res.status(500).json({ message: "Error interno del servidor." });
     }
