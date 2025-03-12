@@ -70,11 +70,8 @@ exports.validateRegisterOrdenante = [
     body("Telefono")
         .exists()
         .withMessage("El teléfono es requerido")
-        .isArray({ min: 1 })
-        .withMessage("Debe proporcionar al menos un número telefónico")
-        .custom((telefonos) => {
-            return telefonos.every((tel) => /^\d{7,10}$/.test(tel));
-        }).withMessage("Cada número telefónico debe tener entre 7 y 10 dígitos"),
+        .isArray()
+        .withMessage("Debe proporcionar al menos un número telefónico"),
 
     // Validación para la dirección del ordenante (Número exterior)
     body("Direccion.NumeroExterior")

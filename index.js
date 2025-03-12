@@ -16,6 +16,7 @@ const filtroRoutes = require('./routes/filtrosRoutes.js');
 const transaccionRoutes = require('./routes/transaccionRoutes.js')
 const notificacionRoutes = require('./routes/notificacionRoutes');
 
+const ordenanteRoutes = require('./routes/ordenanteRoutes.js');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use('/auth', authRoutes); // Monta las rutas bajo el prefijo "/auth"
 app.use('/operator', operatorRoutes); // Monta las rutas bajo el prefijo "/operator"
 app.use('/admin', adminRoutes); // Monta las rutas bajo el prefijo "/admin"
 app.use('/super', superRoutes); // Monta las rutas bajo el prefijo "/super"
+app.use('/ordenante', ordenanteRoutes);
 
 app.use('/transaccion',transaccionRoutes) // Monta las rutas bajo el prefijo "/transaccion"
 app.use('/activity',activityRoutes); // Monta las rutas bajo el prefijo "/activity"

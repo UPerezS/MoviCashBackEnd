@@ -1,15 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const { validateRegisterOrdenante } = require('../middlewares/ordenanteMiddleware');
 // Se importa el controlador para poder tener acceso a sus metodos
-const operadorController = require("../controllers/ordenanteController")
+const ordenanteController = require("../controllers/ordenanteController");
+const { validateRegisterOrdenante } = require("../middlewares/ordenanteMiddleware");
 
-router.post("/createOrdenante", validateRegisterOrdenante, operadorController.createOrdenante);
+router.get("/getAllOrdenantes", ordenanteController.getAllOrdenantes);
 
-router.get("/getAllOrdenantes", operadorController.getAllOrdenantes);
+router.get("/getOrdenanteByRFC/:RFCOrdenante", ordenanteController.getOrdenanteByRFC);
 
-router.delete("/deleteOrdenante/:RFCOrdenante", operadorController.deleteOrdenante);
+router.get("/getOrdenanteByApellido/:ApPaterno", ordenanteController.getOrdenanteByApellido);
 
-router.put("/updateOrdenante/:RFCOrdenante", operadorController.updateOrdenante);
+router.delete("/deleteOrdenante/:RFCOrdenante", ordenanteController.deleteOrdenante);
+
+router.post("/createOrdenante", validateRegisterOrdenante ,ordenanteController.createOrdenante);
+
+router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante);
 
 module.exports = router;
