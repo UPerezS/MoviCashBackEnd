@@ -35,17 +35,13 @@ const OrdenanteSchema = new Schema({
     Saldo: {
         type: Number,
         required: true,
-        min: 0 // Evita valores negativos
+        min: 0 
     },
     Estado: {
         type: String,
         required: true,
-        enum: ['Activo', 'Inactivo', 'Bloqueado'], // Se agregó "Bloqueado"
+        enum: ['Activo', 'Inactivo', 'Bloqueado'],
         default: 'Activo'
-    },
-    FechaRegistro: {
-        type: Date,
-        required: true
     },
     RFCOperador: {
         type: String,
@@ -82,13 +78,9 @@ const OrdenanteSchema = new Schema({
             required: true
         }
     },
-    FechaActualizacion: {
-        type: Date,
-        default: Date.now // Se actualiza manualmente en el código cuando se edita un documento
-    }
 }, 
 {
-    timestamps: { createdAt: 'fechaCreacion', updatedAt: 'fechaUltimaModificacion' }
+    timestamps: { createdAt: 'FechaRegistro', updatedAt: 'FechaUltimaModificacion' }
 });
 
 const Ordenante = mongoose.model('Ordenante', OrdenanteSchema, "Ordenante");

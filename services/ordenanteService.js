@@ -66,7 +66,6 @@ exports.deleteOrdenante = async (req, res) => {
             return res.status(404).json({ message: "Ordenante no encontrado." });
         }
 
-        // Si el ordenante existe, se procede a eliminarlo
         await Ordenante.deleteOne({ RFCOrdenante });
         return res.status(200).json({ message: "Ordenante eliminado correctamente." });
 
@@ -84,8 +83,6 @@ exports.updateOrdenante = async (RFCOrdenante, ordenanteData) => {
         if (!ordenante) {
             return { error: true, message: "Ordenante no encontrado." };
         }
-
-        // Convertir datos a los tipos correctos
         if (ordenanteData.FechaNacimiento) {
             ordenanteData.FechaNacimiento = new Date(ordenanteData.FechaNacimiento);
         }
@@ -96,10 +93,8 @@ exports.updateOrdenante = async (RFCOrdenante, ordenanteData) => {
             ordenanteData.Saldo = mongoose.Types.Decimal128.fromString(ordenanteData.Saldo.toString());
         }
 
-        // Agregar la fecha de actualización
         ordenanteData.FechaActualizacion = new Date();
 
-        // Actualizar con validaciones
         const updatedOrdenante = await Ordenante.findOneAndUpdate(
             { RFCOrdenante },
             { $set: ordenanteData },

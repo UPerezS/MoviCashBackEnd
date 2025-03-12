@@ -1,10 +1,10 @@
 const Ordenante = require("../models/ordenante");
-const { matchedData } = require("express-validator"); // ✅ Importación correcta
-const OrdenanteService = require('../services/ordenanteService'); // Importar el servicio
+const { matchedData } = require("express-validator");
+const OrdenanteService = require('../services/ordenanteService');
 
 
 exports.getOrdenanteByRFC = async (req, res) => {
-    const { RFCOrdenante } = req.params; // Obtenemos el RFC del ordenante desde los parámetros de la URL
+    const { RFCOrdenante } = req.params;
 
     try {
         const ordenante = await Ordenante.findOne({ RFCOrdenante });
@@ -16,7 +16,6 @@ exports.getOrdenanteByRFC = async (req, res) => {
         return res.status(200).json({ message: "Ordenante encontrado.", data: ordenante });
 
     } catch (error) {
-        // En caso de error, se captura y se responde con el mensaje de error
         console.error("Error al obtener el ordenante: ", error);
         return res.status(500).json({ message: "Error interno del servidor." });
     }
@@ -26,7 +25,7 @@ exports.getOrdenanteByApellido = async (req, res) => {
     try {
         const { ApPaterno } = req.params;
 
-        // Buscamos el apellido exacto en la base de datos
+        // Apellido exacto
         const ordenantes = await Ordenante.find({ ApPaterno });
 
         if (!ordenantes || ordenantes.length === 0) {
@@ -43,7 +42,6 @@ exports.getOrdenanteByApellido = async (req, res) => {
 
 exports.getAllOrdenantes = async (req, res) => {
     try {
-        // Buscamos todos los ordenantes en la base de datos
         const ordenantes = await Ordenante.find();
 
         if (ordenantes.length === 0) {
@@ -61,8 +59,6 @@ exports.createOrdenante = async (req, res) => {
     try {
         const body = matchedData(req); // Obtener los datos del cuerpo de la solicitud
 
-    
-        // Crear y guardar el nuevo ordenante en la base de datos
         const nuevoOrdenante = new Ordenante(body);
         await nuevoOrdenante.save();
 
@@ -76,7 +72,7 @@ exports.createOrdenante = async (req, res) => {
 };
 
 exports.deleteOrdenante = async (req, res) => {
-    const { RFCOrdenante } = req.params;  // Obtenemos el RFC del ordenante desde los parámetros de la URL
+    const { RFCOrdenante } = req.params;
 
     try {
         const ordenante = await Ordenante.findOne({ RFCOrdenante });
@@ -96,11 +92,10 @@ exports.deleteOrdenante = async (req, res) => {
 
 
 exports.updateOrdenante = async (req, res) => {
-    const { RFCOrdenante } = req.params; // Obtenemos el RFC del ordenante desde los parámetros de la URL
-    const ordenanteData = req.body; // Obtenemos los datos del ordenante desde el cuerpo de la solicitud
+    const { RFCOrdenante } = req.params;
+    const ordenanteData = req.body;
 
     try {
-        // Llamar al servicio para actualizar el ordenante
         const result = await OrdenanteService.updateOrdenante(RFCOrdenante, ordenanteData);
 
         if (result.error) {
