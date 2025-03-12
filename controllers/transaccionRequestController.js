@@ -10,11 +10,9 @@ exports.solicitarTransaccion = async (req, res) => {
     const rfcOperador = req.user.RFC;
     const montoNum = req.montoValidado;
     const { ordenante, beneficiario } = req.cuentas;
-
     // Obtener datos del operador
     const operador = await transaccionService.findOperador(rfcOperador);
     const montoTotal = montoNum % 1 === 0 ? montoNum + 0.01 : montoNum;
-
     // Preparar el documento de transacción
     const transaccionData = {
       IdComprobante: generarIdComprobante(),

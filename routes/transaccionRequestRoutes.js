@@ -3,7 +3,7 @@ const router = express.Router();
 const transaccionController = require('../controllers/transaccionRequestController');
 const transaccionMiddleware = require('../middlewares/transaccionRequestMiddleware');
 
-// Aplicar middlewares de autenticación y autorización a todas las rutas
+// Se aplica middlewares de autenticación y autorización a todas las rutas
 router.use(transaccionMiddleware.verificarTokenTransaccion);
 router.use(transaccionMiddleware.esOperadorTransaccion);
 
@@ -14,10 +14,10 @@ router.post('/solicitar', transaccionMiddleware.validarDatosTransaccion,transacc
 router.get('/estado/:estado', transaccionMiddleware.validarEstadoTransaccion,transaccionController.obtenerTransaccionesPorEstado);
 
 // Obtener todas las transacciones
-router.get('/', transaccionController.obtenerTransacciones);
+router.get('/obtenerTranssacciones', transaccionController.obtenerTransacciones);
 
 // Obtener una transacción por su ID
-router.get('/:id', transaccionController.obtenerTransaccionPorId);
+router.get('/obtenerTranssaccionId/:id', transaccionController.obtenerTransaccionPorId);
 
 module.exports = router;
 

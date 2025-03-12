@@ -84,7 +84,6 @@ exports.validarDatosTransaccion = (req, res, next) => {
   try {
     const { numeroCuentaOrdenante, numeroCuentaBeneficiario, monto, concepto } = req.body;
 
-    // Validaciones
     if (!numeroCuentaOrdenante || !numeroCuentaBeneficiario || !monto || !concepto) {
       return res.status(400).json({
         success: false,
@@ -107,10 +106,8 @@ exports.validarDatosTransaccion = (req, res, next) => {
         error: "El monto debe ser un número positivo",
       });
     }
-
-    // Guardar el monto validado para usarlo en el controlador
+    // Guardar el monto para usarlo en el controlador
     req.montoValidado = montoNum;
-    
     next();
   } catch (error) {
     return res.status(500).json({

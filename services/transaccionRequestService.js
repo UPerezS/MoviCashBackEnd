@@ -28,7 +28,6 @@ exports.createTransaccion = async (transaccionData) => {
   try {
     const nuevaTransaccion = new TransaccionModel({
       ...transaccionData,
-      // Asegurar que Monto sea double
       Monto: Number(transaccionData.Monto)
     });
     
@@ -103,7 +102,7 @@ exports.notificarOperadores = async (operadores, transaccion) => {
   
   if (operadores && operadores.length > 0) {
     // Determinar si el monto debe ser ocultado (> 20,000)
-    const montoMostrado = transaccion.Monto > 20000 ? "MONTO CONFIDENCIAL" : transaccion.Monto;
+    const montoMostrado = transaccion.Monto > 20000 ? "Monto Confidencial" : transaccion.Monto;
     
     // Crear notificaciones para cada operador
     for (const operador of operadores) {
