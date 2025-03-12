@@ -3,23 +3,19 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-// const authRoutes = require('./routes/auth.js'); // Importa las rutas de autenticación register, login, ect
+const authRoutes = require('./routes/authRoutes.js'); // Importa las rutas de autenticación
 
-
-const authRoutes = require('./routes/auth.js'); // Importa las rutas de autenticación
 const operatorRoutes = require('./routes/operatorRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js') // Importa las rutas de admin
 const superRoutes = require('./routes/superRoutes.js');
-const activityRoutes = require('./routes/activityRoutes.js');
 
-const filtroRoutes = require('./routes/filtrosRoutes.js');
-const transaccionRoutes = require('./routes/transaccionRoutes.js')
+const activityRoutes = require('./routes/activityRoutes.js');
+const transaccionRoutes = require('./routes/transaccionRoutes.js');
 const notificacionRoutes = require('./routes/notificacionRoutes');
 
+const filtroRoutes = require('./routes/filtrosRoutes.js');
 
 const app = express();
-
-
 
 // Middlewares
 app.use(cors());
@@ -36,7 +32,6 @@ app.use('/transaccion',transaccionRoutes) // Monta las rutas bajo el prefijo "/t
 app.use('/activity',activityRoutes); // Monta las rutas bajo el prefijo "/activity"
 app.use('/notificacion',notificacionRoutes);
 
-app.use('/auth', authRoutes); // Monta las rutas bajo el prefijo "/auth"
 app.use('/filtros', filtroRoutes); // Monta las rutas bajo el prefijo "/filtros"
 
 module.exports = app;
