@@ -42,6 +42,6 @@ app.use('/auth', authRoutes); // Monta las rutas bajo el prefijo "/auth"
 app.use('/filtros', filtroRoutes); // Monta las rutas bajo el prefijo "/filtros"
 
 //Solicitud de transacciones
-app.use('/transacciones', transaccionRequestRoutes); // Monta las rutas bajo el refijo /transacciones 
+app.use('/transacciones', transaccionRequestRoutes); // Monta las rutas bajo el refijo /transacciones
 
 module.exports = app;

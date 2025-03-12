@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const TransaccionModel = require('../models/transaccionRequest');
-const OrdenanteModel = require('../models/ordenante'); // Usa la ruta correcta a tu modelo
-const PersonalModel = require('../models/personal'); // Asegúrate de que este modelo exista
-const ActividadModel = require('../models/actividad'); // Usa la ruta correcta a tu modelo
+const OrdenanteModel = require('../models/ordenante'); 
+const PersonalModel = require('../models/personal'); 
+const ActividadModel = require('../models/actividad'); 
 const { ocultarMonto } = require('../utils/ocultarMonto');
 
 // Buscar ordenante por número de cuenta
@@ -16,6 +16,11 @@ exports.findOrdenante = async (numeroCuenta) => {
 // Buscar operador por RFC
 exports.findOperador = async (rfc) => {
   return await PersonalModel.findOne({ RFC: rfc });
+};
+
+// Buscar transacción por ID
+exports.findById = async (id) => {
+  return await TransaccionModel.findById(id);
 };
 
 // Crear una transacción
@@ -56,7 +61,6 @@ exports.registrarActividad = async (rfcOperador, nombreCompleto, rol, accion, de
       actividad.NombreCompleto = nombreCompleto;
       actividad.Rol = rol;
     }
-    
     // Añadir la nueva acción
     actividad.Acciones.push({
       Accion: accion,
@@ -92,8 +96,7 @@ exports.getTransaccionesPorEstado = async (estado) => {
   return await TransaccionModel.find({ Estado: estado }).sort({ Fecha: -1 });
 };
 
-// Notificar a operadores (modificado para usar el modelo de notificaciones si lo tienes)
-
+// Notificar a operadores
 exports.notificarOperadores = async (operadores, transaccion) => {
   // Importar el servicio de notificaciones
   const notificacionService = require('../services/notificacionService');
@@ -106,10 +109,9 @@ exports.notificarOperadores = async (operadores, transaccion) => {
     for (const operador of operadores) {
       const mensaje = `Nueva solicitud de transacción ${transaccion.IdComprobante} de ${transaccion.NombreCompletoOrdenante} a ${transaccion.NombreCompletoBeneficiario} por ${montoMostrado}.`;
       
-      // Usar la función de notificación existente
-      await notificacionService.guardarNotificacion(operador.RFC, mensaje, transaccion._id);
+      // función de notificación existente, especificando el tipo como 'SolicitudTransaccion'
+      await notificacionService.guardarNotificacion(operador.RFC, mensaje,transaccion._id,'SolicitudTransaccion');
     }
-    
     console.log(`Se enviaron notificaciones a ${operadores.length} operadores sobre la transacción ${transaccion.IdComprobante}`);
   }
 };

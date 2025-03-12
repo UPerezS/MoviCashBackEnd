@@ -6,68 +6,14 @@ const TransaccionModel = require('../models/transaccionRequest');
 // Solicitar una transacción
 exports.solicitarTransaccion = async (req, res) => {
   try {
-    const { numeroCuentaOrdenante, numeroCuentaBeneficiario, monto, concepto } = req.body;
+    const { numeroCuentaOrdenante, numeroCuentaBeneficiario, concepto } = req.body;
     const rfcOperador = req.user.RFC;
-
-    // Validaciones
-    if (!numeroCuentaOrdenante || !numeroCuentaBeneficiario || !monto || !concepto) {
-      return res.status(400).json({
-        success: false,
-        error: "Todos los campos son obligatorios",
-      });
-    }
-
-    if (numeroCuentaOrdenante === numeroCuentaBeneficiario) {
-      return res.status(400).json({
-        success: false,
-        error: "No puedes realizar una transacción a la misma cuenta",
-      });
-    }
-
-    // Validar monto
-    const montoNum = parseFloat(monto);
-    if (isNaN(montoNum) || montoNum <= 0) {
-      return res.status(400).json({
-        success: false,
-        error: "El monto debe ser un número positivo",
-      });
-    }
-
-    // Obtener ordenante y validar permisos
-    const ordenante = await transaccionService.findOrdenante(numeroCuentaOrdenante);
-    if (!ordenante) {
-      return res.status(404).json({
-        success: false,
-        error: "Ordenante no encontrado o inactivo",
-      });
-    }
-
-    if (ordenante.RFCOperador !== rfcOperador) {
-      return res.status(403).json({
-        success: false,
-        error: "No tienes permisos para usar esta cuenta de ordenante",
-      });
-    }
-
-    // Verificar si el ordenante tiene saldo suficiente
-    if (ordenante.Saldo < montoNum) {
-      return res.status(400).json({
-        success: false,
-        error: `Saldo insuficiente.`,
-      });
-    }
-
-    // Obtener beneficiario
-    const beneficiario = await transaccionService.findOrdenante(numeroCuentaBeneficiario);
-    if (!beneficiario) {
-      return res.status(404).json({
-        success: false,
-        error: "Beneficiario no encontrado o inactivo",
-      });
-    }
+    const montoNum = req.montoValidado;
+    const { ordenante, beneficiario } = req.cuentas;
 
     // Obtener datos del operador
     const operador = await transaccionService.findOperador(rfcOperador);
+    const montoTotal = montoNum % 1 === 0 ? montoNum + 0.01 : montoNum;
 
     // Preparar el documento de transacción
     const transaccionData = {
@@ -79,7 +25,7 @@ exports.solicitarTransaccion = async (req, res) => {
       NombreCompletoBeneficiario: `${beneficiario.NombreOrdenante} ${beneficiario.ApPaterno} ${beneficiario.ApMaterno || ""}`.trim(),
       RFCOperador: rfcOperador,
       NombreCompletoOperador: `${operador.NombrePersonal} ${operador.ApPaterno} ${operador.ApMaterno || ""}`.trim(),
-      Monto: Number(montoNum),
+      Monto: montoTotal,
       Tipo: "Transferencia",
       Estado: "Pendiente",
       Fecha: new Date(),
@@ -138,80 +84,83 @@ exports.solicitarTransaccion = async (req, res) => {
 
 // Obtener todas las transacciones
 exports.obtenerTransacciones = async (req, res) => {
-    try {
-      const transaccionService = require("../services/transaccionRequestService");
-      
-      // Obtener todas las transacciones sin filtros
-      const transacciones = await transaccionService.getAllTransacciones();
-      
-      res.status(200).json({
-        success: true,
-        transacciones
-      });
-    } catch (error) {
-      console.error("Error al obtener transacciones:", error);
-      res.status(500).json({
-        success: false,
-        error: "Error al obtener transacciones: " + error.message
-      });
-    }
-  };
+  try {
+    // Obtener todas las transacciones sin filtros
+    const transacciones = await transaccionService.getAllTransacciones();
+    
+    // Transformar las transacciones para ocultar montos confidenciales
+    const transaccionesTransformadas = transacciones.map(t => 
+      transformarTransaccion(t.toObject ? t.toObject() : t)
+    );
+    
+    res.status(200).json({
+      success: true,
+      transacciones: transaccionesTransformadas
+    });
+  } catch (error) {
+    console.error("Error al obtener transacciones:", error);
+    res.status(500).json({
+      success: false,
+      error: "Error al obtener transacciones: " + error.message
+    });
+  }
+};
 
-  // Obtener transacciones por estado
+// Obtener transacciones por estado
 exports.obtenerTransaccionesPorEstado = async (req, res) => {
-    try {
-      const { estado } = req.params;
-      const transaccionService = require("../services/transaccionRequestService");
-      
-      // Validar que el estado sea válido
-      const estadosValidos = ['Pendiente', 'Aprobado', 'Cancelado'];
-      if (!estadosValidos.includes(estado)) {
-        return res.status(400).json({
-          success: false,
-          error: `Estado no válido. Debe ser uno de: ${estadosValidos.join(', ')}`
-        });
-      }
-      
-      // Obtener transacciones con el estado especificado
-      const transacciones = await transaccionService.getTransaccionesPorEstado(estado);
-      
-      res.status(200).json({
-        success: true,
-        estado,
-        transacciones
-      });
-    } catch (error) {
-      console.error("Error al obtener transacciones por estado:", error);
-      res.status(500).json({
-        success: false,
-        error: "Error al obtener transacciones por estado: " + error.message
-      });
-    }
-  };
+  try {
+    const { estado } = req.params;
+    
+    // Obtener transacciones con el estado especificado
+    const transacciones = await transaccionService.getTransaccionesPorEstado(estado);
+    
+    // Transformar las transacciones para ocultar montos confidenciales
+    const transaccionesTransformadas = transacciones.map(t => 
+      transformarTransaccion(t.toObject ? t.toObject() : t)
+    );
+    
+    res.status(200).json({
+      success: true,
+      estado,
+      transacciones: transaccionesTransformadas
+    });
+  } catch (error) {
+    console.error("Error al obtener transacciones por estado:", error);
+    res.status(500).json({
+      success: false,
+      error: "Error al obtener transacciones por estado: " + error.message
+    });
+  }
+};
   
-  // Obtener una transacción por su ID
-  exports.obtenerTransaccionPorId = async (req, res) => {
-    try {
-      const { id } = req.params;
-      
-      const transaccion = await TransaccionModel.findById(id);
-      
-      if (!transaccion) {
-        return res.status(404).json({
-          success: false,
-          error: "Transacción no encontrada"
-        });
-      }
-      
-      res.status(200).json({
-        success: true,
-        transaccion
-      });
-    } catch (error) {
-      console.error("Error al obtener transacción:", error);
-      res.status(500).json({
+// Obtener una transacción por su ID
+exports.obtenerTransaccionPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const transaccion = await TransaccionModel.findById(id);
+    
+    if (!transaccion) {
+      return res.status(404).json({
         success: false,
-        error: "Error al obtener transacción: " + error.message
+        error: "Transacción no encontrada"
       });
     }
-  };
+    
+    // Transformar la transacción para ocultar monto confidencial
+    const transaccionTransformada = transformarTransaccion(
+      transaccion.toObject ? transaccion.toObject() : transaccion
+    );
+    
+    res.status(200).json({
+      success: true,
+      transaccion: transaccionTransformada
+    });
+  } catch (error) {
+    console.error("Error al obtener transacción:", error);
+    res.status(500).json({
+      success: false,
+      error: "Error al obtener transacción: " + error.message
+    });
+  }
+};
