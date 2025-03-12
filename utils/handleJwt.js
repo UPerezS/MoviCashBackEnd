@@ -12,6 +12,7 @@ const tokenSign = async (user) => {
     {
       _id: user._id,
       role: user.Rol,
+      RFC: user.RFC,
     },
     JWT_SECRET,
     { expiresIn: '1h' }
