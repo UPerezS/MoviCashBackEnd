@@ -43,7 +43,7 @@ const OrdenanteSchema = new Schema({
         type: String,
         required: true,
         enum: ['Activo', 'Inactivo', 'Bloqueado'],
-        default: 'Activo'
+        default: 'Inactivo'
     },
     RFCOperador: {
         type: String,

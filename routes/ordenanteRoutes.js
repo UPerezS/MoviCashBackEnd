@@ -16,4 +16,6 @@ router.post("/createOrdenante", validateRegisterOrdenante ,ordenanteController.c
 
 router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante);
 
+router.patch('/ordenantes/:RFCOrdenante/estado', ordenanteController.updateEstadoOrdenante);
+
 module.exports = router;
