@@ -1,59 +1,49 @@
 const userService = require('../services/userService');
 const authService = require('../services/authService');
 const emailService = require('../services/emailService');
+
 const { hash, compare, generateTempPassword } = require('../utils/handlePassword');
 const generateCode = require('../utils/handleCode');
+const handleHttpError = require('../utils/handleHttpError');
+
 const Personal = require("../models/personal");
 const Ordenante = require("../models/ordenante");
 
+const { matchedData } = require('express-validator');
 
 // Registro de usuario: operador / administrador
-exports.register = async (req, res) => {
+exports.registrar = async (req, res) => {
   try {
-    const { RFC, NombrePersonal, ApPaterno, ApMaterno, Sexo, FechaNacimiento, CorreoElectronico, Rol, Direccion, Telefono } = req.body;
-
-    if (!RFC || !NombrePersonal || !ApPaterno || !CorreoElectronico || !Rol) {
-      return res.status(400).json({ error: "Todos los campos obligatorios deben ser proporcionados." });
-    }
+    const body = matchedData(req);
 
     const tempPassword = generateCode(10);
     const hashedPassword = await hash(tempPassword);
 
     const newUsuario = await userService.registerUser({
-      RFC,
-      NombrePersonal,
-      ApPaterno,
-      ApMaterno,
-      Sexo,
-      FechaNacimiento,
-      CorreoElectronico,
+      ...body,
       Password: hashedPassword,
-      Rol,
-      Direccion,
-      Telefono,
       Estado: "Inactivo", // Hasta que cambie la contraseña
     });
 
-
     // Enviar correo con la contraseña temporal
     try {
-      await emailService.enviarCodigo(CorreoElectronico, tempPassword);
-      console.log(`Correo enviado a: ${CorreoElectronico}`);
+      await emailService.enviarCodigo(body.CorreoElectronico, tempPassword);
+
     } catch (emailError) {
-      console.error(`Error al enviar el correo a ${CorreoElectronico}:`, emailError.message);
+      handleHttpError(res, 'Error al enviar el correo', 500, emailError);
     }
 
-    res.status(201).json({ message: `${Rol} registrado exitosamente`, usuario: newUsuario });
+    res.status(201).json({ message: `${body.Rol} registrado exitosamente`, usuario: newUsuario });
   } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+    handleHttpError(res, 'Error al Registrar el Usuario', 500, error);
   }
 };
 
 exports.login = async (req, res) => {
   try {
-    const { CorreoElectronico, Password } = req.body;
+    const body = matchedData(req);
 
-    const usuario = await userService.getUserByEmail(CorreoElectronico);
+    const usuario = await userService.getUserByEmail(body.CorreoElectronico);
     if (!usuario) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
@@ -62,48 +52,38 @@ exports.login = async (req, res) => {
       return res.status(403).json({ error: "Tu cuenta ha sido bloqueada. Contacta al administrador." });
     }
 
-    const isMatch = await compare(Password, usuario.Password);
+    const isMatch = await compare(body.Password, usuario.Password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Contraseña incorrecta' });
     }
 
     const code = await authService.generarCodigoVerificacion(usuario._id);
-    await emailService.enviarCodigo(CorreoElectronico, code);
+    await emailService.enviarCodigo(body.CorreoElectronico, code);
 
     res.status(200).json({ message: 'Código de verificación enviado' });
   } catch (error) {
-    res.status(500).json({ error: 'Error interno del servidor' });
+    handleHttpError(res, 'Error al Iniciar Sesión', 500, error);
   }
 };
 
 exports.verificarCodigoYGenerarToken = async (req, res) => {
   try {
-    const { CorreoElectronico, code } = req.body;
-
-    const usuario = await userService.getUserByEmail(CorreoElectronico);
+    const body = matchedData(req);
+    const usuario = await userService.getUserByEmail(body.CorreoElectronico);
     if (!usuario) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
-    const isValid = await authService.verificarCodigo(usuario._id, code);
+    const isValid = await authService.verificarCodigo(usuario._id, body.code);
     if (!isValid) {
       return res.status(400).json({ error: "Código inválido o expirado" });
     }
 
     const token = await authService.generarToken(usuario);
 
-    // Enviar el token por correo
-    try {
-      await emailService.enviarCodigo(CorreoElectronico, `Tu token de acceso es: ${token}`);
-      console.log(`Token enviado a: ${CorreoElectronico}`);
-    } catch (emailError) {
-      console.error(`Error al enviar el token por correo:`, emailError.message);
-    }
-
     res.status(200).json({ message: "Inicio de sesión exitoso", token });
   } catch (error) {
-    console.error("Error en verificarCodigoYGenerarToken:", error.message);
-    res.status(500).json({ error: "Error interno del servidor" });
+    handleHttpError(res, 'Error al VerificarYGenerar el Codigo de 6 digitos', 500, error);
   }
 };
 

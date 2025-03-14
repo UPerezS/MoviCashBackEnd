@@ -2,18 +2,24 @@
 const express = require("express");
 const router = express.Router();
 
-const { validateRegister, validateLogin, validateNewPassword} = require("../middlewares/authValidator");
+const { 
+    validateRegister, 
+    validateLogin, 
+    validateCodigo, 
+    validateNewPassword
+} = require("../middlewares/authValidator");
+
 const authController = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
 // Ruta para registrar un usuario
-router.post("/register", validateRegister, authController.register);
+router.post("/registrar", validateRegister, authController.registrar);
 
 // Ruta para iniciar sesión
 router.post("/login", validateLogin, authController.login);
 
 // Verificar de codigo enviado al usuario
-router.post('/verificar-codigo', authController.verificarCodigoYGenerarToken);
+router.post('/verificar-codigo', validateCodigo, authController.verificarCodigoYGenerarToken);
 
 // Recuperar contraseña con correo electronico
 router.post("/recover-password", authController.recoverPassword);
