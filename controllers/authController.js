@@ -6,6 +6,7 @@ const generateCode = require('../utils/handleCode');
 const Personal = require("../models/personal");
 const Ordenante = require("../models/ordenante");
 
+
 // Registro de usuario: operador / administrador
 exports.register = async (req, res) => {
   try {
@@ -127,7 +128,7 @@ exports.recoverPassword = async (req, res) => {
   }
 };
 
-// Actualizar contraseña 
+// Actualizar contraseña
 exports.updatePassword = async (req, res) => {
   try {
     const { CorreoElectronico, tempPassword, newPassword } = req.body;

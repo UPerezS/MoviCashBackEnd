@@ -10,6 +10,8 @@ const authRoutes = require('./routes/auth.js'); // Importa las rutas de autentic
 const operatorRoutes = require('./routes/operatorRoutes.js');
 const adminRoutes = require('./routes/adminRoutes.js') // Importa las rutas de admin
 const superRoutes = require('./routes/superRoutes.js');
+
+const transaccionRequestRoutes = require('./routes/transaccionRequestRoutes.js'); // Importa las rutas de solicitudes de transacciones
 const activityRoutes = require('./routes/activityRoutes.js');
 
 const filtroRoutes = require('./routes/filtrosRoutes.js');
@@ -40,5 +42,8 @@ app.use('/notificacion',notificacionRoutes);
 
 app.use('/auth', authRoutes); // Monta las rutas bajo el prefijo "/auth"
 app.use('/filtros', filtroRoutes); // Monta las rutas bajo el prefijo "/filtros"
+
+//Solicitud de transacciones
+app.use('/transacciones', transaccionRequestRoutes); // Monta las rutas bajo el refijo /transacciones
 
 module.exports = app;
