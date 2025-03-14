@@ -1,6 +1,6 @@
 const NotificacionService = require('../services/notificacionService');
 
-// Función para obtener las notificaciones pendientes de un operador
+// Funciones originales
 exports.obtenerNotificaciones = async (req, res) => {
     const { RFCOperador } = req.params;
 
@@ -18,10 +18,15 @@ exports.obtenerNotificaciones = async (req, res) => {
     }
 };
 
-// Función para marcar las notificaciones como "enviado"
 exports.marcarNotificacionesComoEnviadas = async (req, res) => {
     try {
-        await NotificacionService.marcarNotificacionesComoEnviadas(req, res);
+        const { RFCOperador } = req.params;
+        const resultado = await NotificacionService.marcarNotificacionesComoEnviadas(RFCOperador);
+        
+        if (resultado.sinNotificaciones) {
+            return res.status(200).json({ message: 'No tienes notificaciones pendientes.' });
+        }
+        
         res.status(200).json({ message: 'Notificaciones leídas, ya has visto todas las notificaciones, estás al día.' });
     } catch (error) {
         console.error('Error al marcar notificaciones como enviadas:', error);

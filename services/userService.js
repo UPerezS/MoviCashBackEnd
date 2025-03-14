@@ -16,16 +16,14 @@ exports.registerUser = async (userData) => {
         const newUsuario = new Personal(userData);
         return await newUsuario.save();
     } catch (error) {
-        throw new Error(`Error al registrar ${userData.Rol}: ` + error.message);
+        throw error;
     }
 };
 
 // Obtener un usuario por correo electrónico
 exports.getUserByEmail = async (email) => {
 
-    const user = await Personal.findOne({
-      CorreoElectronico: { $regex: new RegExp("^" + email.trim() + "$", "i") } //Ignora mayúsculas/minúsculas
-    });
+    const user = await Personal.findOne({ CorreoElectronico: { $eq: email }});
   
     return user;
   };
