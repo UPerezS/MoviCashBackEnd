@@ -71,49 +71,55 @@ exports.validateRegisterOrdenante = [
         .exists()
         .withMessage("El teléfono es requerido")
         .isArray()
-        .withMessage("Debe proporcionar al menos un número telefónico"),
+        .withMessage("Debe proporcionar al menos un número telefónico")
+        .notEmpty()
+        .withMessage("El campo Telefono no puede estar vacio"),
 
     // Validación para la dirección del ordenante (Número exterior)
     body("Direccion.NumeroExterior")
         .exists()
         .withMessage("Ingrese el número exterior")
         .isString()
-        .withMessage("El número exterior debe ser texto"),
+        .withMessage("El número exterior debe ser texto")
+        .notEmpty()
+        .withMessage("El campo numero exterior no puede estar vacio"),
 
     // Número interior
-    body("Direccion.NumeroInterior")
+    body("NumeroInterior")
         .optional()
         .isString()
-        .withMessage("El número interior debe ser texto"),
+        .withMessage("El número interior debe ser texto")
+        .notEmpty()
+        .withMessage("El campo numero Interior no pude estar vacio"),
 
     // Calle
-    body("Direccion.Calle")
+    body("Calle")
         .exists()
         .withMessage("Ingrese el nombre de la calle")
         .isString()
-        .withMessage("El nombre de la calle debe ser texto"),
+        .withMessage("El nombre de la calle debe ser texto")
+        .notEmpty()
+        .withMessage("El campo calle no puede estar vacio"),
 
     // Colonia
-    body("Direccion.Colonia")
+    body("Colonia")
         .exists()
         .withMessage("Ingrese el nombre de la colonia")
         .isString()
-        .withMessage("El nombre de la colonia debe ser texto"),
+        .withMessage("El nombre de la colonia debe ser texto")
+        .notEmpty()
+        .withMessage("El campo colonia no puede estar vacio"),
 
     // Ciudad
-    body("Direccion.Ciudad")
+    body("Ciudad")
         .exists()
         .withMessage("Ingrese el nombre de la ciudad")
         .isString()
-        .withMessage("El nombre de la ciudad debe ser texto"),
+        .withMessage("El nombre de la ciudad debe ser texto")
+        .notEmpty()
+        .withMessage("El campo ciudad no puede estar vacio"),
 
-    // Validación para la fecha de registro
-    body("FechaRegistro")
-        .exists()
-        .withMessage("La fecha de registro es requerida")
-        .isISO8601()
-        .withMessage("La fecha de registro debe estar en formato ISO"),
-
+    
     // Función para verificación de errores
     (req, res, next) => {
         const errors = validationResult(req); // Recopila los errores
