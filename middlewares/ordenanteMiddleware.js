@@ -6,17 +6,12 @@ exports.validateRegisterOrdenante = [
     body("RFCOrdenante")
         .exists()
         .withMessage("El RFC es requerido")
+        .notEmpty()
+        .withMessage("El RFC no puede estar vacío")
         .isLength({ min: 13, max: 13 })
         .withMessage("El RFC debe tener 13 caracteres")
         .matches(/^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/)
         .withMessage("El RFC debe ser válido"),
-
-    // Validación del campo RFC del operador
-    body("RFCOperador")
-        .exists()
-        .withMessage("El RFC del operador es requerido")
-        .isLength({ min: 13, max: 13 })
-        .withMessage("El RFC debe tener 13 caracteres"),
 
     // Validación del campo Nombre del ordenante
     body("NombreOrdenante")
@@ -33,7 +28,7 @@ exports.validateRegisterOrdenante = [
         .isLength({ max: 20 })
         .withMessage("El apellido materno no puede tener más de 20 caracteres"),
     body("ApPaterno")
-        .exists()  
+        .exists()
         .withMessage("El apellido paterno es requerido")
         .notEmpty()
         .withMessage("El campo apellido paterno no puede estar vacío")
@@ -44,6 +39,8 @@ exports.validateRegisterOrdenante = [
     body("Sexo")
         .exists()
         .withMessage("El sexo es requerido")
+        .notEmpty() 
+        .withMessage("El campo sexo no puede estar vacío")
         .isIn(["M", "F"])
         .withMessage("Seleccione 'M' para Masculino, 'F' para Femenino"),
 
@@ -51,18 +48,24 @@ exports.validateRegisterOrdenante = [
     body("FechaNacimiento")
         .exists()
         .withMessage("La fecha de nacimiento es requerida")
+        .notEmpty() 
+        .withMessage("La fecha de nacimiento no puede estar vacía")
         .isISO8601()
         .withMessage("La fecha de nacimiento debe estar en formato ISO"),
 
     // Validación para el número de cuenta del ordenante
     body("NumeroCuenta")
         .exists()
-        .withMessage("El número de cuenta es obligatorio"),
+        .withMessage("El número de cuenta es obligatorio")
+        .notEmpty() 
+        .withMessage("El número de cuenta no puede estar vacío"),
 
     // Validación para el saldo de la cuenta del ordenante
     body("Saldo")
         .exists()
         .withMessage("El saldo de la cuenta es requerido")
+        .notEmpty()
+        .withMessage("El saldo de la cuenta no puede estar vacío")
         .isFloat({ min: 0 })
         .withMessage("El saldo de la cuenta debe ser mayor o igual a 0"),
 
@@ -70,56 +73,62 @@ exports.validateRegisterOrdenante = [
     body("Telefono")
         .exists()
         .withMessage("El teléfono es requerido")
+        .notEmpty() 
+        .withMessage("El campo teléfono no puede estar vacío")
         .isArray()
-        .withMessage("Debe proporcionar al menos un número telefónico")
-        .notEmpty()
-        .withMessage("El campo Telefono no puede estar vacio"),
+        .withMessage("Debe proporcionar al menos un número telefónico"),
 
     // Validación para la dirección del ordenante (Número exterior)
     body("Direccion.NumeroExterior")
         .exists()
         .withMessage("Ingrese el número exterior")
-        .isString()
-        .withMessage("El número exterior debe ser texto")
         .notEmpty()
-        .withMessage("El campo numero exterior no puede estar vacio"),
+        .withMessage("El número exterior no puede estar vacío")
+        .isString()
+        .withMessage("El número exterior debe ser texto"),
 
     // Número interior
-    body("NumeroInterior")
+    body("Direccion.NumeroInterior")
         .optional()
         .isString()
-        .withMessage("El número interior debe ser texto")
-        .notEmpty()
-        .withMessage("El campo numero Interior no pude estar vacio"),
+        .withMessage("El número interior debe ser texto"),
 
     // Calle
-    body("Calle")
+    body("Direccion.Calle")
         .exists()
         .withMessage("Ingrese el nombre de la calle")
-        .isString()
-        .withMessage("El nombre de la calle debe ser texto")
         .notEmpty()
-        .withMessage("El campo calle no puede estar vacio"),
+        .withMessage("El nombre de la calle no puede estar vacío")
+        .isString()
+        .withMessage("El nombre de la calle debe ser texto"),
 
     // Colonia
-    body("Colonia")
+    body("Direccion.Colonia")
         .exists()
         .withMessage("Ingrese el nombre de la colonia")
-        .isString()
-        .withMessage("El nombre de la colonia debe ser texto")
         .notEmpty()
-        .withMessage("El campo colonia no puede estar vacio"),
+        .withMessage("El nombre de la colonia no puede estar vacío")
+        .isString()
+        .withMessage("El nombre de la colonia debe ser texto"),
 
     // Ciudad
-    body("Ciudad")
+    body("Direccion.Ciudad")
         .exists()
         .withMessage("Ingrese el nombre de la ciudad")
-        .isString()
-        .withMessage("El nombre de la ciudad debe ser texto")
         .notEmpty()
-        .withMessage("El campo ciudad no puede estar vacio"),
+        .withMessage("El nombre de la ciudad no puede estar vacío")
+        .isString()
+        .withMessage("El nombre de la ciudad debe ser texto"),
 
-    
+    // Validación para la fecha de registro
+    body("FechaRegistro")
+        .exists()
+        .withMessage("La fecha de registro es requerida")
+        .notEmpty() 
+        .withMessage("La fecha de registro no puede estar vacía")
+        .isISO8601()
+        .withMessage("La fecha de registro debe estar en formato ISO"),
+
     // Función para verificación de errores
     (req, res, next) => {
         const errors = validationResult(req); // Recopila los errores
