@@ -117,27 +117,24 @@ exports.updateOrdenante = async (req, res) => {
         const { Estado } = req.body;
 
         try {
-            const result = await Ordenante.updateOne(
-                { RFCOrdenante },
-                { $set: { Estado } },
-                { runValidators: true }
-            );
-
-            if (result.matchedCount === 0) {
-                return res.status(404).json({ message: "Ordenante no encontrado." });
+            const ordenante = await Ordenante.findOne({RFCOrdenante });
+            if (!ordenante) {return res.status(404).json({ error: 'Ordenante no encontrado.' });
             }
+            
+            if (ordenante.Estado === Estado) {
+                return res.status(400).json({ error: `El estado ya está actulizado a: "${Estado}".` });
+              }
+            
+              ordenante.Estado = Estado;
+              await ordenante.save();
+          
+              res.status(200).json({
+                message: `Estado del ordenante actualizado a "${Estado}".`,
+                data: ordenante
+              });
 
-            if (result.modifiedCount === 0) {
-                return res.status(400).json({ message: "El estado no ha cambiado o no es válido." });
-            }
-
-            res.status(200).json({
-                message: `Estado del ordenante actualizado a ${Estado}.`,
-                updatedCount: result.modifiedCount
-            });
-
-        } catch (error) {
-            console.error("Error al actualizar el estado del ordenante:", error.message);
-            res.status(500).json({ message: "Error interno del servidor." });
-        }
-    };
+            } catch (error) {
+                console.error('Error al actualizar el estado del ordenante:', error.message);
+                handleHttpError(res, 'Error de actualizar ordenante', 500, error.message);
+              }
+            };
