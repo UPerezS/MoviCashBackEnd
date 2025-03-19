@@ -7,5 +7,6 @@ const reportController = require("../controllers/reportController");
 router.patch("/AR/:IdComprobante/accion", transaccionController.updateEstadoTransaccion);
 router.get("/report/:IdComprobante",reportController.getTransaccion);
 
+router.patch("/depositoCuantaAhorro", transaccionController.depositoCuentaAhorro);
 
 module.exports = router;

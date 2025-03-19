@@ -19,7 +19,9 @@ const filtroRoutes = require('./routes/filtrosRoutes.js');
 
 const app = express();
 
-// Middlewares
+
+//Middlewares
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,6 +36,7 @@ app.use('/ordenante', ordenanteRoutes);
 app.use('/transaccion',transaccionRoutes) // Monta las rutas bajo el prefijo "/transaccion"
 app.use('/activity',activityRoutes); // Monta las rutas bajo el prefijo "/activity"
 app.use('/notificacion',notificacionRoutes);
+
 
 app.use('/filtros', filtroRoutes); // Monta las rutas bajo el prefijo "/filtros"
 
