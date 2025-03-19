@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const transaccionController = require("../controllers/transaccionController"); 
-const { validateUpdateEstadoTransaccion } = require("../middlewares/transaccionMilddleware");
+const { validateUpdateEstadoTransaccion } = require("../middlewares/transaccionMiddleware");
 const reportController = require("../controllers/reportController");
 
 // Ruta para actualizar el estado de una transacción al rechazar o aceptar
