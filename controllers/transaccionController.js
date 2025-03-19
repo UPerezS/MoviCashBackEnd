@@ -1,39 +1,25 @@
-const Transaccion = require("../models/transaccion");
 const Ordenante = require("../models/ordenante");
 const Notificacion = require("../services/notificacionService");
+const handleHttpError = require("../utils/handleHttpError");
+
 
 
 // Actualizar el estado de una transacción- Rechazar o aceptar transacción 
 exports.updateEstadoTransaccion = async (req, res) => {
-    const { IdComprobante } = req.params; // ID de la transacción como parámetro
-    const { accion } = req.body; // Acción a realizar ("aceptada" o "rechazada")
-
     try {
-        const transaccion = await Transaccion.findOne({IdComprobante});
-        
-        if (!transaccion) {
-            return res.status(404).json({ message: "Transacción no encontrada." });
-        }
+    const { accion } = req.body; 
+    const transaccion = req.transaccion; 
+    const ordenante = req.ordenante; 
 
-        if (!["Aceptar", "Rechazar"].includes(accion)) {
-            return res.status(400).json({ message: "Acción no válida. Debe ser 'Aceptar' o 'Rechazar'." });
-        }
 
         transaccion.Estado = accion === "Aceptar" ? "Aprobado" : "Cancelado";
         transaccion.FechaActualizacionRespuesta = new Date();
 
         if (accion === "Aceptar") {
-            
-            const ordenante = await Ordenante.findOne({ NumeroCuenta: transaccion.NumeroCuentaOrdenante });
-            const beneficiario = await Ordenante.findOne({ NumeroCuenta: transaccion.NumeroCuentaBeneficiario});
-
-            if (!ordenante || !beneficiario) {
-                return res.status(400).json({ message: "Ordenante o beneficiario no encontrado." });
-            }
-
-            // Validar saldo del ordenante que ya deberia de estar valido anteriormente 
-            if (ordenante.Saldo < transaccion.Monto) {
-                return res.status(400).json({ message: "Saldo insuficiente." });
+            const beneficiario = await Ordenante.findOne({ NumeroCuenta: transaccion.NumeroCuentaBeneficiario });
+      
+            if (!beneficiario) {
+              return res.status(400).json({ message: "Beneficiario no encontrado." });
             }
 
             // Realizar la transacción
@@ -48,14 +34,12 @@ exports.updateEstadoTransaccion = async (req, res) => {
 
   // Guardar notificación pendiente para el operador
   const mensaje = `La transacción ${transaccion.IdComprobante} se ha  ${transaccion.Estado}.`;
-
-  // Guardar la notificación en MongoDB (en caso de que el operador no esté conectado)
- Notificacion.guardarNotificacion(transaccion.RFCOperador, mensaje, transaccion.IdComprobante);
+  Notificacion.guardarNotificacion(transaccion.RFCOperador, mensaje, transaccion.IdComprobante);
 
   res.status(200).json({ message: `Transacción ${accion} con éxito.`, data: transaccion });
 } catch (error) {
   console.error("Error al actualizar la transacción: ", error);
-  res.status(500).json({ message: "Error interno del servidor." });
+  handleHttpError(res,"Error al actualizar la transacción: ",500,error)
 }
-
 };
+
