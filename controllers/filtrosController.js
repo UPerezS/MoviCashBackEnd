@@ -3,6 +3,7 @@ const Personal = require("../models/personal");
 const Transaccion = require("../models/transaccion");
 const Ordenante = require("../models/ordenante");
 const { verifyToken } = require("../utils/handleJwt");
+const handleHttpError = require('../utils/handleHttpError');
 
 // * Filtro de usuarios
 exports.filterUsers = async (req, res) => {
@@ -81,7 +82,7 @@ exports.filterUsers = async (req, res) => {
 
     } catch (error) {
         console.error("Error al obtener los usuarios:", error);
-        return res.status(500).json({ message: "Error interno del servidor." });
+        handleHttpError(res, "Error al Obtener los Usuarios", 500, error);
     }
 };
 
@@ -149,6 +150,6 @@ exports.filterTransactions = async (req, res) => {
 
     } catch (error) {
         console.error("Error al obtener las transacciones:", error);
-        res.status(500).json({ message: "Error interno del servidor." });
+        handleHttpError(res, "Error al Obtener las Transacciones", 500, error);
     }
 };
