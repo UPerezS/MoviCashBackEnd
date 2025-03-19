@@ -133,7 +133,7 @@ exports.validateRegisterOrdenante = [
     (req, res, next) => {
         const errors = validationResult(req); // Recopila los errores
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() }); // Retorna los errores si hay alguno
+            return handleHttpError(res, "Error de Validacion", 400, errors.array());
         }
         next(); // Continúa con el siguiente middleware o controlador si no hay errores
     },

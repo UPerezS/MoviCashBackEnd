@@ -1,6 +1,7 @@
 const Ordenante = require("../models/ordenante");
 const { matchedData } = require("express-validator");
 const OrdenanteService = require('../services/ordenanteService');
+const handleHttpError = require('../utils/handleHttpError');
 
 
 exports.getOrdenanteByRFC = async (req, res) => {
@@ -13,11 +14,10 @@ exports.getOrdenanteByRFC = async (req, res) => {
             return res.status(404).json({ message: "Ordenante no encontrado." });
         }
 
-        return res.status(200).json({ message: "Ordenante encontrado.", data: ordenante });
+        return res.status(200).json({ message: "Ordenante encontrado.", ordenante });
 
     } catch (error) {
-        console.error("Error al obtener el ordenante: ", error);
-        return res.status(500).json({ message: "Error interno del servidor." });
+        handleHttpError(res, "Error al Obtener el Ordenante por RFC", 500, error);
     }
 }
 
@@ -32,11 +32,11 @@ exports.getOrdenanteByApellido = async (req, res) => {
             return res.status(404).json({ message: "No se encontró información para el apellido ingresado." });
         }
 
-        return res.status(200).json({ message: "Ordenante(s) encontrado(s).", data: ordenantes });
+        return res.status(200).json({ message: "Ordenante(s) encontrado(s).", ordenantes });
 
     } catch (error) {
         console.error("Error al obtener el ordenante: ", error);
-        return res.status(500).json({ message: "Error interno del servidor." });
+        handleHttpError(res, "Error al Obtener el Ordenante por Apellido", 500, error);
     }
 };
 
@@ -48,10 +48,10 @@ exports.getAllOrdenantes = async (req, res) => {
             return res.status(404).json({ message: "No se encontraron ordenantes." });
         }
 
-        return res.status(200).json({ message: "Ordenantes encontrados.", data: ordenantes });
+        return res.status(200).json({ message: "Ordenantes encontrados.", ordenantes });
     } catch (error) {
         console.error("Error al obtener los ordenantes: ", error);
-        return res.status(500).json({ message: "Error interno del servidor." });
+        handleHttpError(res, "Error al Obtener Todos los Ordenantes", 500, error);
     }
 };
 
@@ -63,11 +63,11 @@ exports.createOrdenante = async (req, res) => {
         await nuevoOrdenante.save();
 
         console.log("Ordenante creado con éxito.");
-        res.status(201).json({ message: "Ordenante creado con éxito.", data: nuevoOrdenante });
+        res.status(201).json({ message: "Ordenante creado con éxito.", nuevoOrdenante });
 
     } catch (error) {
         console.error("Error al crear el ordenante:", error);
-        res.status(500).json({ message: "Error interno del servidor.", error: error.message });
+        handleHttpError(res, "Error al Crear el Ordenante", 500, error);
     }
 };
 
@@ -82,11 +82,11 @@ exports.deleteOrdenante = async (req, res) => {
         }
 
         await Ordenante.deleteOne({ RFCOrdenante });
-        return res.status(200).json({ message: "Ordenante eliminado con éxito." });
+        return res.status(200).json({ message: "Ordenante eliminado con éxito.", ordenante });
 
     } catch (error) {
         console.error("Error al eliminar el ordenante: ", error);
-        return res.status(500).json({ message: "Error interno del servidor." });
+        handleHttpError(res, "Error al Eliminar el Ordenante", 500, error);
     }
 };
 
@@ -102,11 +102,11 @@ exports.updateOrdenante = async (req, res) => {
             return res.status(result.statusCode).json({ message: result.message });
         }
 
-        return res.status(200).json({ message: "Ordenante actualizado correctamente.", data: result.data });
+        return res.status(200).json({ message: "Ordenante actualizado correctamente.", result });
 
     } catch (error) {
         console.error("Error al actualizar el ordenante: ", error);
-        return res.status(500).json({ message: "Error interno del servidor." });
+        handleHttpError(res, "Error al actualizar el Ordenante", 500, error);
     }
 };
 
@@ -138,6 +138,6 @@ exports.updateOrdenante = async (req, res) => {
 
         } catch (error) {
             console.error("Error al actualizar el estado del ordenante:", error.message);
-            res.status(500).json({ message: "Error interno del servidor." });
+            handleHttpError(res, "Error al actualizar el estado del Ordenante", 500, error);
         }
     };
