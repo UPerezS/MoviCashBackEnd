@@ -8,6 +8,12 @@ const OrdenanteSchema = new Schema({
         unique: true,
         match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/
     },
+    RFCOperador: {
+        type: String,
+        required: true,
+        unique: true,
+        match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/
+    },
     NombreOrdenante: {
         type: String,
         required: true
@@ -45,10 +51,7 @@ const OrdenanteSchema = new Schema({
         enum: ['Activo', 'Inactivo', 'Bloqueado'],
         default: 'Inactivo'
     },
-    RFCOperador: {
-        type: String,
-        required: true
-    },
+    
     Telefono: {
         type: [String],
         required: true,
