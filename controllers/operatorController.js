@@ -1,4 +1,6 @@
 const operatorService = require("../services/operatorService");
+const { validationResult } = require("express-validator");
+const handleHttpError = require("../utils/handleHttpError");
 
 // Obtener operador por RFC
 exports.getOperatorByRFC = async (req, res) => {
@@ -12,7 +14,7 @@ exports.getOperatorByRFC = async (req, res) => {
 
     res.status(200).json(operator);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    handleHttpError(res, "Error al obtener el operador", 500, error);
   }
 };
 
@@ -28,7 +30,7 @@ exports.getAllOperators = async (req, res) => {
     res.status(200).json({ message: "Operadores encontrados.", data: operators });
   } catch (error) {
     console.error("Error al obtener los operadores: ", error);
-    res.status(500).json({ message: "Error interno del servidor." });
+    handleHttpError(res, "Error al obtener los operadores", 500, error);
   }
 };
 
@@ -49,13 +51,19 @@ exports.deleteOperator = async (req, res) => {
 
   } catch (error) {
     console.error("Error al eliminar el operador: ", error);
-    res.status(500).json({ message: "Error interno del servidor." });
+    handleHttpError(res, "Error al eliminar el operador", 500, error);
   }
 };
 
 // Actualizar datos del operador
 exports.updateOperator = async (req, res) => {
   try {
+    // Validar los datos con express-validator
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return handleHttpError(res, "Error de validación", 400, errors.array());
+    }
+
     const { RFC } = req.params;
     const updateData = req.body;
 
@@ -72,6 +80,6 @@ exports.updateOperator = async (req, res) => {
 
     res.status(200).json({ message: "Operador actualizado", operator: updatedOperator });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    handleHttpError(res, "Error al actualizar el operador", 500, error);
   }
 };
