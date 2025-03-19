@@ -12,6 +12,6 @@ router.get('/getAllAdmin', authMiddleware, checkRol(['Admin']), adminController.
 router.delete('/deleteAdmin/:RFC', authMiddleware, checkRol(['Admin']), adminController.deleteAdmin);
 
 // Ruta para actualizar a un administrador
-router.put('/updateAdmin/:RFC', authMiddleware, checkRol(['Admin']), adminController.updateAdmin);
+router.patch('/updateAdmin/:RFC', authMiddleware, checkRol(['Admin']), adminController.updateAdmin);
 
 module.exports = router;
