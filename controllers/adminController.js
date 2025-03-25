@@ -1,4 +1,5 @@
 const Personal = require("../models/personal");
+const Actividad = require('../models/actividad')
 
 //Mostrar usuarios
 exports.getAllAdmin = async (req, res) => {
@@ -14,7 +15,7 @@ exports.getAllAdmin = async (req, res) => {
     }
 };
 
-//Eliminar Admines
+//Eliminar Admines y registrar fecha de eliminacion en Actividad
 exports.deleteAdmin = async (req, res) => {
     const { RFC } = req.params; // Se define como parametro el RFC
     const rol = await Personal.findOne({RFC: RFC},{Rol:1}) // Se guarda el rol del personal con el RFC del parametro, para validar que sea Admin
@@ -26,6 +27,21 @@ exports.deleteAdmin = async (req, res) => {
                 console.log('Admin no encontrado.');
                 return res(estatus(404)).json({ message: "Admin no encontrado."});
             }
+
+            // Registrar la actividad al eliminar
+            await Actividad.updateOne(
+                { RFC },
+                {
+                    $push: {
+                        Acciones: {
+                            Accion: "Eliminación",
+                            Detalles: "Se ha eliminado el usuario de manera permanente.",
+                            Fecha: new Date()
+                        }
+                    }
+                },
+                { upsert: true }
+            );
             
             await Personal.deleteOne({ RFC });  // En caso de si encontrar un Admin con el RFC del parametro, elimina al Admin
             res.status(200).json({ message: "Admin eliminado con exito."})
@@ -36,63 +52,88 @@ exports.deleteAdmin = async (req, res) => {
         console.error("Error al eliminar el Admin: ", error);
         res.status(500).json({ message: "Error interno del servidor." });
     }
-}
+};
 
 
-//Actualizar Admines
+// Actualizar Admin y registrar cambios en Actividad
 exports.updateAdmin = async (req, res) => {
-    const { RFC } = req.params; // RFC como parámetro
-    const {
-      NombrePersonal, ApPaterno, ApMaterno, Rol, CorreoElectronico,
-      NumeroInterior, NumeroExterior, Calle, Colonia, Ciudad, Lada,
-      Numero, Estado
-    } = req.body;
-  
+    const { RFC } = req.params;
+    const cambios = req.body;
+    const campos = Object.keys(cambios);
+
     try {
-      const admin = await Personal.findOne({ RFC }); // Buscar al Admin
-  
-      if (!admin) {
-        return res.status(404).json({ message: "Empleado no encontrado." });
-      }
-  
-      if (admin.Rol !== "Admin") {
-        return res.status(403).json({ message: "El personal no es Admin." });
-      }
-  
-      // Verificar campos obligatorios
-      if (!NombrePersonal || !ApPaterno || !CorreoElectronico ||
-          !Rol || !NumeroExterior || !Calle || !Colonia ||
-          !Ciudad || !Lada || !Numero || !Estado) {
-        return res.status(400).json({ message: "Faltan campos requeridos." });
-      }
-  
-      // Actualizar Admin
-      await Personal.updateOne(
-        { RFC },
-        {
-          $set: {
-            NombrePersonal,
-            ApPaterno,
-            ApMaterno: ApMaterno || "",
-            CorreoElectronico,
-            Rol,
-            Direccion: {
-              NumeroInterior: NumeroInterior || "",
-              NumeroExterior,
-              Calle,
-              Colonia,
-              Ciudad
-            },
-            Telefono: [{ Lada, Numero }],
-            Estado
-          }
+        // Construir proyección dinámica + Rol
+        let proyeccion = {};
+        campos.forEach(campo => {
+            proyeccion[campo] = 1;
+        });
+        proyeccion.Rol = 1;
+
+        // Buscar el admin
+        const admin = await Personal.findOne({ RFC }).select(proyeccion);
+
+        if (!admin) {
+            return res.status(404).json({ message: "Admin no encontrado." });
         }
-      );
-  
-      res.status(200).json({ message: "Empleado actualizado con éxito." });
-  
+        if (admin.Rol !== "Admin") {
+            return res.status(403).json({ message: "El usuario no es un Admin." });
+        }
+
+        // Función para limpiar campos innecesarios
+        function limpiarCampos(obj) {
+            const { Rol, Telefono,...resto } = obj;
+
+            // Valida el contenido del telefono
+            if (Telefono && Array.isArray(Telefono)) {
+                const telefonoLimpio = Telefono.filter(tel => tel.Lada || tel.Numero);
+                if (telefonoLimpio.length > 0) {
+                    resto.Telefono = telefonoLimpio;
+                }
+            }
+            return resto;
+        }
+
+        // Aplicar limpieza
+        const adminLimpio = limpiarCampos(admin.toObject());
+        const cambiosLimpios = limpiarCampos(cambios);
+
+        const modificaciones = {
+            Anterior: adminLimpio,
+            Actualizado: cambiosLimpios
+        };
+
+        // Construir mensaje de detalles
+        let detallesMensaje = "Se han actualizado los siguientes campos: ";
+        detallesMensaje += campos.join(", ");
+
+        // Registrar en coleccion Actividad
+        await Actividad.updateOne(
+            { RFC, Rol: admin.Rol },
+            {
+                $push: {
+                    Acciones: {
+                        Accion: "Actualización",
+                        Detalles: detallesMensaje,
+                        Modificacion: [modificaciones],
+                        Fecha: new Date()
+                    }
+                }
+            },
+            { upsert: true }
+        );
+
+        console.log("Actividad registrada:", detallesMensaje);
+        console.log("Cuerpo recibido:", cambios);
+        console.log("Cuerpo limpio:", cambiosLimpios);
+
+
+        // Actualizar en coleccion Personal
+        await Personal.updateOne({ RFC }, { $set: cambios });
+
+        res.status(200).json({ message: "Admin actualizado con éxito." });
+
     } catch (error) {
-      console.error("Error al actualizar Admin:", error);
-      res.status(500).json({ message: "Error interno del servidor." });
+        console.error("Error al actualizar Admin:", error);
+        res.status(500).json({ message: "Error interno del servidor." });
     }
-  };
+};

@@ -6,6 +6,7 @@ const Actividad = require("../models/actividad");
  en caso de que aun no se cuente con un registro de acciones,
  el sistema la crea automaticamente y registra las acciones.
  */
+
  const addAction = async (RFC, Rol, actionData) => {
     try {
         var activity = await Actividad.findOne({ RFC, Rol });
@@ -52,26 +53,42 @@ const Actividad = require("../models/actividad");
 
 const getActivity = async(filters) => {
     try{
-        var query = {};
+        var pipeline = [
+            {$unwind: "$Acciones"},
+            {$match:{}}
+        ];
+
+        var matchStage = {};
 
         //Filtramos por nombre si se proporciona
         if(filters.nombre){
-            query.NombreCompleto = {$regex: new RegExp(filters.nombre,'i')}; //lo hacemos insensible a mayusculas y minusculas
+            matchStage.NombreCompleto = {$regex: new RegExp(filters.nombre,'i')}; //lo hacemos insensible a mayusculas y minusculas
         }
 
         //Filtramos por ROL si se proporciona
         if(filters.rol){
-            query.rol = filters.Rol;
+            matchStage.Rol = filters.rol;
         }
         //Filtramos por rango de fechas
         if(filters.fechaInicio && filters.fechaFin){
-            query.FechaCreacion = {
+            matchStage["Acciones.Fecha"] = {
                 $gte: new Date(filters.fechaInicio),
                 $lte: new Date(filters.fechaFin)
             };
         }
 
-        return await Actividad.find(query);
+        //Filtramos por tipo de accion
+        if(filters.accion){
+            matchStage["Acciones.Accion"] = filters.accion;
+        }
+
+        if(Object.keys(matchStage).length > 0){
+            pipeline.push({$match:matchStage});
+        }
+
+        const activities = await Actividad.aggregate(pipeline);
+
+        return activities;
     }catch(error){
         console.error("Error en getActivity: ", error.message);
         throw new Error("Error al obtener actividades: "+error.message);

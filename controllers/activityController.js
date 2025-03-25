@@ -26,18 +26,17 @@ const registerActivity = async (req,res)=>{
 
 const getActivity = async (req,res) => {
     try {
-        const { nombre, rol, fechaInicio, fechaFin} = req.query;
-        const filters = {nombre, rol, fechaInicio, fechaFin};
+        const { nombre, rol, fechaInicio, fechaFin, accion} = req.query;
+        const filters = {nombre, rol, fechaInicio, fechaFin, accion};
 
         const activity = await activityService.getActivity(filters);
         res.json(activity);
     }catch(error){
         console.error('Error al obtener las actividades: ',error);
-        res.status(500).json({error : 'Error en el servidor'});
+        res.status(500).json({error : 'Error interno del servidor'});
     }
 };
 
 
 //Exportamos los modulos de registros
 module.exports = {registerActivity, getActivity};
-
