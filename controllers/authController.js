@@ -116,6 +116,13 @@ exports.recoverPassword = async (req, res) => {
     user.Password = await hash(tempPassword);
     await user.save();
 
+    try {
+      await emailService.enviarContraseña(CorreoElectronico, tempPassword);
+    } catch (emailError) {
+      console.error("Error al enviar el correo:", emailError);
+      return res.status(500).json({ error: "Error al enviar la contraseña temporal por correo" });
+    }
+
     res.status(200).json({ message: "Contraseña temporal generada", tempPassword });
   } catch (error) {
     console.error("Error en la recuperación de contraseña:", error);
