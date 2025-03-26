@@ -112,6 +112,9 @@ exports.recoverPassword = async (req, res) => {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
+    user.Estado = 'Inactivo'
+    await user.save()
+
     const tempPassword = generateTempPassword();
     user.Password = await hash(tempPassword);
     await user.save();
@@ -144,6 +147,9 @@ exports.updatePassword = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ error: "La contraseña temporal es incorrecta" });
     }
+
+    user.Estado = 'Activo'
+    await user.save()
 
     user.Password = await hash(newPassword);
     await user.save();
