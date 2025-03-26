@@ -1,6 +1,7 @@
 const operatorService = require("../services/operatorService");
 const { validationResult } = require("express-validator");
 const handleHttpError = require("../utils/handleHttpError");
+const {hash} = require("../utils/handlePassword");
 
 // Obtener operador por RFC
 exports.getOperatorByRFC = async (req, res) => {
@@ -55,7 +56,7 @@ exports.deleteOperator = async (req, res) => {
   }
 };
 
-// Actualizar datos del operador
+// Actualizar operador
 exports.updateOperator = async (req, res) => {
   try {
     // Validar los datos con express-validator
@@ -63,23 +64,67 @@ exports.updateOperator = async (req, res) => {
     if (!errors.isEmpty()) {
       return handleHttpError(res, "Error de validación", 400, errors.array());
     }
-
+ 
     const { RFC } = req.params;
     const updateData = req.body;
-
+ 
+    // Encriptar contraseña si se proporciona
     if (updateData.Password) {
-      updateData.Password = await encript(updateData.Password);
+      updateData.Password = await hash(updateData.Password);
     }
-
+ 
+    // Actualizar fecha de última modificación
     updateData.FechaUltimaModificacion = new Date();
-    const updatedOperator = await operatorService.updateOperator(RFC, updateData);
-
+ 
+    // Campos permitidos para actualización
+    const allowedFields = [
+      'CorreoElectronico', 
+      'Direccion', 
+      'Telefono', 
+      'Estado', 
+      'Password'
+    ];
+ 
+    // Crear objeto de actualización con solo los campos permitidos
+    const fieldsToUpdate = {};
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) {
+        fieldsToUpdate[field] = updateData[field];
+      }
+    });
+ 
+    // Opciones de actualización para manejar validaciones
+    const updateOptions = {
+      new: true,  // Devolver el documento actualizado
+      runValidators: true,  // Ejecutar validadores de esquema
+      context: 'query'  // Usar contexto de consulta para validaciones
+    };
+ 
+    // Realizar la actualización
+    const updatedOperator = await operatorService.updateOperator(
+      RFC, 
+      fieldsToUpdate, 
+      updateOptions
+    );
+ 
     if (!updatedOperator) {
       return res.status(404).json({ error: "Operador no encontrado" });
     }
-
-    res.status(200).json({ message: "Operador actualizado", operator: updatedOperator });
+ 
+    res.status(200).json({ 
+      message: "Operador actualizado exitosamente", 
+      operator: updatedOperator 
+    });
   } catch (error) {
+    // Manejo más detallado del error
+    console.error('Error de actualización:', error);
+    
+    // Verificar tipos específicos de errores de validación
+    if (error.name === 'ValidationError') {
+      const errorMessages = Object.values(error.errors).map(err => err.message);
+      return handleHttpError(res, "Error de validación", 400, errorMessages);
+    }
+ 
     handleHttpError(res, "Error al actualizar el operador", 500, error);
   }
 };
