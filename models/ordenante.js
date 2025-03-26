@@ -11,7 +11,6 @@ const OrdenanteSchema = new Schema({
     RFCOperador: {
         type: String,
         required: true,
-        unique: true,
         match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/
     },
     NombreOrdenante: {
@@ -23,10 +22,9 @@ const OrdenanteSchema = new Schema({
         required: true
     },
     ApMaterno: {
-        type: String
+        type: String,
+        default: null
     },
-    ApMaterno: { 
-        type: String },
     Sexo: {
         type: String,
         required: true,
@@ -51,7 +49,6 @@ const OrdenanteSchema = new Schema({
         enum: ['Activo', 'Inactivo', 'Bloqueado'],
         default: 'Inactivo'
     },
-    
     Telefono: {
         type: [String],
         required: true,
@@ -68,7 +65,8 @@ const OrdenanteSchema = new Schema({
             required: true
         },
         NumeroInterior: {
-            type: String
+            type: String,
+            default: null
         },
         Calle: {
             type: String,
@@ -82,10 +80,13 @@ const OrdenanteSchema = new Schema({
             type: String,
             required: true
         }
-    },
+    }
 }, 
 {
-    timestamps: { createdAt: 'FechaRegistro', updatedAt: 'FechaUltimaModificacion' }
+    timestamps: { 
+        createdAt: 'FechaRegistro', 
+        updatedAt: 'FechaUltimaModificacion' 
+    }
 });
 
 const Ordenante = mongoose.model('Ordenante', OrdenanteSchema, "Ordenante");
