@@ -1,7 +1,7 @@
 const csv = require('csv-parser');
 const fs = require('fs');
 const Ordenante = require('../models/ordenante');
-const Om = require('../middlewares/ordenanteMiddleware');
+const Om = require('../middlewares/csvMiddleware');
 
 exports.insertBulk = async (req, res) => {
   const fields = [];
