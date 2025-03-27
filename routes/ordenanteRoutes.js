@@ -3,6 +3,7 @@ const router = express.Router();
 // Se importa el controlador para poder tener acceso a sus metodos
 const ordenanteController = require("../controllers/ordenanteController");
 const { validateRegisterOrdenante } = require("../middlewares/ordenanteMiddleware");
+const authMiddleware = require('../middlewares/authMiddleware')
 
 router.get("/getAllOrdenantes", ordenanteController.getAllOrdenantes);
 
@@ -12,7 +13,7 @@ router.get("/getOrdenanteByApellido/:ApPaterno", ordenanteController.getOrdenant
 
 router.delete("/deleteOrdenante/:RFCOrdenante", ordenanteController.deleteOrdenante);
 
-router.post("/createOrdenante", validateRegisterOrdenante ,ordenanteController.createOrdenante);
+router.post("/createOrdenante", authMiddleware, validateRegisterOrdenante ,ordenanteController.createOrdenante);
 
 router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante);
 
