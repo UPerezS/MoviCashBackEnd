@@ -21,4 +21,15 @@ const enviarCodigo = async (correo, codigo) => {
   await transporter.sendMail(mailOptions);
 };
 
-module.exports = { enviarCodigo };
+const enviarContraseña = async (correo, contraseña) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: correo,
+    subject: "Nueva contraseña",
+    text: `Tu nueva contraseña es: ${contraseña}`
+  };
+
+  await transporter.sendMail(mailOptions);
+}
+
+module.exports = { enviarCodigo, enviarContraseña };

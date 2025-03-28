@@ -112,9 +112,19 @@ exports.recoverPassword = async (req, res) => {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
 
+    user.Estado = 'Inactivo'
+    await user.save()
+
     const tempPassword = generateTempPassword();
     user.Password = await hash(tempPassword);
     await user.save();
+
+    try {
+      await emailService.enviarContraseña(CorreoElectronico, tempPassword);
+    } catch (emailError) {
+      console.error("Error al enviar el correo:", emailError);
+      return res.status(500).json({ error: "Error al enviar la contraseña temporal por correo" });
+    }
 
     res.status(200).json({ message: "Contraseña temporal generada", tempPassword });
   } catch (error) {
@@ -137,6 +147,9 @@ exports.updatePassword = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ error: "La contraseña temporal es incorrecta" });
     }
+
+    user.Estado = 'Activo'
+    await user.save()
 
     user.Password = await hash(newPassword);
     await user.save();

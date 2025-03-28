@@ -1,5 +1,5 @@
 const { body, validationResult } = require('express-validator');
-const handleHttpError = require ('../utils/handleHttpError');
+const handleHttpError = require('../utils/handleHttpError');
 
 // Validaciones para el registro de ordenante
 exports.validateRegisterOrdenante = [
@@ -138,3 +138,4 @@ exports.validateRegisterOrdenante = [
         next(); // Continúa con el siguiente middleware o controlador si no hay errores
     },
 ];
+
