@@ -20,7 +20,7 @@ const registerActivity = async (req, res) => {
         return newAction;
     } catch(error) {
         console.error("Error en el registro: " + error.message);
-        res.status(500).json({error:"Error interno del servidor"});
+        throw new Error(error.message);
     }
 };
 
