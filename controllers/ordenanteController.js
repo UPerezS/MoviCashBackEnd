@@ -57,10 +57,15 @@ exports.getAllOrdenantes = async (req, res) => {
 
 exports.createOrdenante = async (req, res) => {
     try {
-        const body = matchedData(req); // Obtener los datos del cuerpo de la solicitud
 
-        const nuevoOrdenante = new Ordenante(body);
-        await nuevoOrdenante.save();
+        const userId = req.user._id;
+        const body = matchedData(req); // Obtener los datos del cuerpo de la solicitud
+        console.log(userId);
+
+        const nuevoOrdenante = await OrdenanteService.createOrdenante(userId, body);
+
+        // const nuevoOrdenante = new Ordenante(body);
+        // await nuevoOrdenante.save();
 
         console.log("Ordenante creado con éxito.");
         res.status(201).json({ message: "Ordenante creado con éxito.", nuevoOrdenante });
@@ -68,6 +73,7 @@ exports.createOrdenante = async (req, res) => {
     } catch (error) {
         console.error("Error al crear el ordenante:", error);
         handleHttpError(res, "Error al Crear el Ordenante", 500, error);
+        console.log()
     }
 };
 
