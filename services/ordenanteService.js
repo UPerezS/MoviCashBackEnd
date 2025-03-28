@@ -62,7 +62,7 @@ exports.createOrdenante = async (userId,ordenanteData) => {
         return { message: "Ordenante creado con éxito.", data: newOrdenante };
     } catch (error) {
         console.error("Error al crear el ordenante: ", error);
-        throw new Error("Error al crear el ordenante: " + error.message);  // Lanza el error correctamente
+        throw new Error("Error al crear el ordenante: " + error.message); 
     }
 };
 
