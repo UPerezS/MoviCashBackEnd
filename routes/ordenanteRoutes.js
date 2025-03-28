@@ -6,6 +6,7 @@ const { validateRegisterOrdenante } = require("../middlewares/ordenanteMiddlewar
 const { validateRegisterOrdenante1 } = require("../middlewares/ordenanteMiddleware");
 const csvController = require("../controllers/csvController");
 const uploadCsv = require("../middlewares/csvMiddleware");
+const csvService = require("../services/csvService");
 
 router.get("/getAllOrdenantes", ordenanteController.getAllOrdenantes);
 
@@ -21,6 +22,6 @@ router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante
 
 router.patch('/ordenantes/:RFCOrdenante/estado', ordenanteController.updateEstadoOrdenante);
 
-router.post('/bulkOrdenante', uploadCsv.upload,csvController.insertBulk);
+router.post('/bulkOrdenante', uploadCsv.upload,csvService.validateCSVFile,csvController.insertBulk);
 
 module.exports = router;
