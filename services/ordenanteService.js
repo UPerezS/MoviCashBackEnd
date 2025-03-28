@@ -1,5 +1,6 @@
 const Ordenante = require('../models/ordenante');
 const mongoose = require("mongoose");
+const Personal = require("../models/personal");
 
 // Obtener ordenante por el RFC
 exports.getOrdenanteByRFC = async (RFCOrdenante) => {
@@ -44,14 +45,24 @@ exports.getAllOrdenantes = async () => {
 };
 
 // Crear un nuevo ordenante
-exports.createOrdenante = async (ordenanteData) => {
+exports.createOrdenante = async (userId,ordenanteData) => {
     try {
+        console.log(userId);
+
+        const operador = await Personal.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+
+        if (!operador) {
+            return { error: "Operador no encontrado." };
+        }
+
+        ordenanteData.RFCOperador = operador.RFC;
+
         const newOrdenante = new Ordenante(ordenanteData);
         await newOrdenante.save();
         return { message: "Ordenante creado con éxito.", data: newOrdenante };
     } catch (error) {
         console.error("Error al crear el ordenante: ", error);
-        return error;
+        throw new Error("Error al crear el ordenante: " + error.message); 
     }
 };
 
