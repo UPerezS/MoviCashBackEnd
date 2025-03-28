@@ -11,7 +11,7 @@ MoviCashBackEnd/
 ├── models/             # Modelos (Define la estructura de los datos y cómo interactuar con la base de datos.)
 ├── routes/             # Rutas (Definen los endpoints de la API y asocia cada ruta con un controlador.)
 ├── services/           # Servicios ( Contiene funciones reutilizables que pueden ser usadas por múltiples controladores)
-├── utils/              # Utilidades (funciones helper, validaciones, etc.)
+├── utils/              # Utilidades (funciones helper, validaciones, handdle, etc.)
 |
 ├── index.js            # Configuración de la app Express
 └── server.js           # Inicio del servidor
@@ -79,7 +79,7 @@ MoviCashBackEnd/
 
 **Nota:**
 
-Usar el modo imperativo: **empiezar con un verbo en presente como añadir, corregir, mejorar.**
+Usar el modo imperativo: **empizar con un verbo en presente como añadir, corregir, mejorar.**
 
 
 ✅ Ejemplo: fix: corregir error en el login de usuarios.
@@ -90,7 +90,7 @@ Usar el modo imperativo: **empiezar con un verbo en presente como añadir, corre
 ---
 
 
-**Nota:**: Las claves de las Apis estan en **Jira**, crean el archivo **.env** y las ponen igual que **.env.example**
+**Nota:** Las claves de las Apis estan en **Jira**, crean el archivo **.env** y las ponen igual que **.env.example**
 
 ---
 
