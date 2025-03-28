@@ -13,16 +13,6 @@ exports.validateRegisterOrdenante = [
         .withMessage("El RFC debe tener 13 caracteres")
         .matches(/^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/)
         .withMessage("El RFC debe ser válido"),
-    body("RFCOperador")
-        .exists()
-        .withMessage("El RFC es requerido")
-        .notEmpty()
-        .withMessage("El RFC no puede estar vacío")
-        .isLength({ min: 13, max: 13 })
-        .withMessage("El RFC debe tener 13 caracteres")
-        .matches(/^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/)
-        .withMessage("El RFC debe ser válido"),
-
     // Validación del campo Nombre del ordenante
     body("NombreOrdenante")
         .exists()
