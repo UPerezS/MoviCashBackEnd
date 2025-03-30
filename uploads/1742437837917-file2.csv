@@ -1,0 +1,6 @@
+RFCOrdenante,NombreOrdenante,ApPaterno,ApMaterno,Sexo,FechaNacimiento,NumeroCuenta,Saldo,Estado,RFCOperador,Telefono,NumeroExterior,NumeroInterior,Calle,Colonia,Ciudad
+ORDE880818DEF,Test Masivo 1,Prueba,Pruebas,F,1988-08-18,1212342345,200139.3,Activo,PEMP123456XYZ,1234567890,123,34,Avenida Principal,Centro,Aguascalientes
+ORDE920501ABC,Test Masivo 2,Lopez,Ramirez,M,1992-05-01,6789054321,15000.5,Activo,PEMP987654LMN,9876543210,456,12,Calle Reforma,Norte,Cancún
+ORDE850312XYZ,Test Masivo 3,Gonzalez,Fernandez,F,1985-03-12,8901234567,32000.8,Bloqueado,PEMP654321UVW,5432167890,789,56,Avenida Central,Sur,Celaya
+ORDE780724QWE,Test Masivo 4,Hernandez,Perez,M,1978-07-24,3456789012,50234.2,Inactivo,PEMP147258GHI,1597534682,147,9,Calle Secundaria,Oeste,Chihuahua
+ORDE950918JKL,Test Masivo 5,Sanchez,Ruiz,F,1995-09-18,2109876543,67500.0,Activo,PEMP369258STU,3692581470,258,44,Bulevar Libertad,Centro,Juárez
