@@ -8,6 +8,7 @@ const handleHttpError = require('../utils/handleHttpError');
 
 const Personal = require("../models/personal");
 const Ordenante = require("../models/ordenante");
+const Actividad = require("../models/actividad")
 
 const { matchedData } = require('express-validator');
 
@@ -23,6 +24,20 @@ exports.registrar = async (req, res) => {
       ...body,
       Password: hashedPassword,
       Estado: "Inactivo", // Hasta que cambie la contraseña
+    });
+
+    // Registrar en la colección de actividad
+    await Actividad.insertOne({
+      RFC: body.RFC,
+      NombreCompleto: `${body.NombrePersonal} ${body.ApPaterno} ${body.ApMaterno}`,
+      Rol: body.Rol,
+      Acciones: [
+        {
+          Accion: "Registro",
+          Detalles: `Se ha registrado el usuario ${body.NombrePersonal} ${body.ApPaterno} ${body.ApMaterno} con RFC: ${body.RFC}.`,
+          Fecha: new Date()
+        }
+      ]
     });
 
     // Enviar correo con la contraseña temporal
@@ -100,6 +115,13 @@ exports.recoverPassword = async (req, res) => {
     const tempPassword = generateTempPassword();
     user.Password = await hash(tempPassword);
     await user.save();
+
+    try {
+      await emailService.enviarContraseña(CorreoElectronico, tempPassword);
+    } catch (emailError) {
+      console.error("Error al enviar el correo:", emailError);
+      return res.status(500).json({ error: "Error al enviar la contraseña temporal por correo" });
+    }
 
     res.status(200).json({ message: "Contraseña temporal generada", tempPassword });
   } catch (error) {
