@@ -1,0 +1,11 @@
+RFCOrdenante,RFCOperador,NombreOrdenante,ApPaterno,ApMaterno,Sexo,FechaNacimiento,NumeroCuenta,Saldo,Estado,Telefono,NumeroExterior,NumeroInterior,Calle,Colonia,Ciudad
+LOSC910516ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,F,01/05/1992,2934567890,10000,Activo,5432167890,100,10,Calle Ficticia,Colonia 1,Ciudad A
+LOSC920517ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,M,02/05/1992,2934567891,15000,Inactivo,5432167890,101,11,Calle Real,Colonia 2,Ciudad B
+LOSC930518ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,F,03/05/1992,2934567892,20000,Bloqueado,5432167890,102,12,Calle Principal,Colonia 3,Ciudad C
+LOSC940519ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,M,04/05/1992,2934567893,25000,Activo,5432167890,103,13,Calle Secundaria,Colonia 4,Ciudad D
+LOSC960520ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,F,05/05/1992,2934567894,30000,Inactivo,5432167890,104,14,Calle Norte,Colonia 5,Ciudad E
+LOSC970521ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,M,06/05/1992,2934567895,35000,Bloqueado,5432167890,105,15,Calle Sur,Colonia 6,Ciudad F
+LOSC980522ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,F,07/05/1992,2934567896,40000,Activo,5432167890,106,16,Calle Este,Colonia 7,Ciudad G
+LOSC990523ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,M,08/05/1992,2934567897,45000,Inactivo,5432167890,107,17,Calle Oeste,Colonia 8,Ciudad H
+LOSC951524ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,F,09/05/1992,2934567898,50000,Activo,5432167890,108,18,Calle A,Colonia 9,Ciudad I
+LOSC952525ABE,PEMP987654LMN,Test Nuevo Insercion,Insercion,Masiva,M,10/05/1992,2934567899,55000,Bloqueado,5432167890,109,19,Calle B,Colonia 10,Ciudad J

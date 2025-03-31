@@ -57,10 +57,15 @@ exports.getAllOrdenantes = async (req, res) => {
 
 exports.createOrdenante = async (req, res) => {
     try {
-        const body = matchedData(req); // Obtener los datos del cuerpo de la solicitud
 
-        const nuevoOrdenante = new Ordenante(body);
-        await nuevoOrdenante.save();
+        const userId = req.user._id;
+        const body = matchedData(req); // Obtener los datos del cuerpo de la solicitud
+        console.log(userId);
+
+        const nuevoOrdenante = await OrdenanteService.createOrdenante(userId, body);
+
+        // const nuevoOrdenante = new Ordenante(body);
+        // await nuevoOrdenante.save();
 
         console.log("Ordenante creado con éxito.");
         res.status(201).json({ message: "Ordenante creado con éxito.", nuevoOrdenante });
@@ -68,6 +73,7 @@ exports.createOrdenante = async (req, res) => {
     } catch (error) {
         console.error("Error al crear el ordenante:", error);
         handleHttpError(res, "Error al Crear el Ordenante", 500, error);
+        console.log()
     }
 };
 
@@ -117,27 +123,24 @@ exports.updateOrdenante = async (req, res) => {
         const { Estado } = req.body;
 
         try {
-            const result = await Ordenante.updateOne(
-                { RFCOrdenante },
-                { $set: { Estado } },
-                { runValidators: true }
-            );
-
-            if (result.matchedCount === 0) {
-                return res.status(404).json({ message: "Ordenante no encontrado." });
+            const ordenante = await Ordenante.findOne({RFCOrdenante });
+            if (!ordenante) {return res.status(404).json({ error: 'Ordenante no encontrado.' });
             }
+            
+            if (ordenante.Estado === Estado) {
+                return res.status(400).json({ error: `El estado ya está actulizado a: "${Estado}".` });
+              }
+            
+              ordenante.Estado = Estado;
+              await ordenante.save();
+          
+              res.status(200).json({
+                message: `Estado del ordenante actualizado a "${Estado}".`,
+                data: ordenante
+              });
 
-            if (result.modifiedCount === 0) {
-                return res.status(400).json({ message: "El estado no ha cambiado o no es válido." });
-            }
-
-            res.status(200).json({
-                message: `Estado del ordenante actualizado a ${Estado}.`,
-                updatedCount: result.modifiedCount
-            });
-
-        } catch (error) {
-            console.error("Error al actualizar el estado del ordenante:", error.message);
-            handleHttpError(res, "Error al actualizar el estado del Ordenante", 500, error);
-        }
-    };
+            } catch (error) {
+                console.error('Error al actualizar el estado del ordenante:', error.message);
+                handleHttpError(res, 'Error de actualizar ordenante', 500, error.message);
+              }
+            };

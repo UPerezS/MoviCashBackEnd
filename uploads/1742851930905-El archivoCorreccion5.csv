@@ -1,0 +1,13 @@
+RFCOrdenante,NombreOrdenante,ApPaterno,ApMaterno,Sexo,FechaNacimiento,NumeroCuenta,Saldo,Estado,RFCOperador,Telefono,NumeroExterior,NumeroInterior,Calle,Colonia,Ciudad
+LOSC850515ABE,Juan,Lopez,Ramirez,M,1992-05-01T00:00:00.000+00:00,6789054321,15000.5,Activo,PEMP987654LMN,9876543210,456,12,Calle Reforma,Norte,Cancún
+LOSC850515ABF,Ana,Gonzalez,Fernandez,F,1985-03-12T00:00:00.000+00:00,8901234567,32000.8,Bloqueado,PEMP654321UVW,5432167890,789,56,Avenida Central,Sur,Celaya
+LOSC850515ABG,Luis,Hernandez,Perez,M,1978-07-24T00:00:00.000+00:00,3456789012,50234.2,Inactivo,PEMP147258GHI,1597534682,147,9,Calle Secundaria,Oeste,Chihuahua
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,
