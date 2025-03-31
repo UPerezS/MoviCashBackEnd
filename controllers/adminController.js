@@ -25,7 +25,7 @@ exports.deleteAdmin = async (req, res) => {
             const exist = await Personal.findOne({ RFC }); // Se guarda el Admin buscado
             if (!exist) { // Si no hay un Admin con el RFC del parametro, entonces se manda un mensaje de no encontrado
                 console.log('Admin no encontrado.');
-                return res.status(404).json({ message: "Admin no encontrado."});
+                return res(estatus(404)).json({ message: "Admin no encontrado."});
             }
 
             // Registrar la actividad al eliminar
@@ -46,7 +46,7 @@ exports.deleteAdmin = async (req, res) => {
             await Personal.deleteOne({ RFC });  // En caso de si encontrar un Admin con el RFC del parametro, elimina al Admin
             res.status(200).json({ message: "Admin eliminado con exito."})
         }else{  
-            return res.status(404).json("El personal a eliminar no es admin");
+            console.error("El personal no es Admin.") // En caso de que el personal a querer eliminar no sea Admin manda un mensaje de error
         }
     }catch(error) { // Se define un try catch para atrapar cualquier error que pueda suceder
         console.error("Error al eliminar el Admin: ", error);

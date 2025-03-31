@@ -1,10 +1,19 @@
 const { body, validationResult } = require('express-validator');
-const handleHttpError = require('../utils/handleHttpError');
+const handleHttpError = require ('../utils/handleHttpError');
 
 // Validaciones para el registro de ordenante
 exports.validateRegisterOrdenante = [
     // Validación del campo RFC del ordenante
     body("RFCOrdenante")
+        .exists()
+        .withMessage("El RFC es requerido")
+        .notEmpty()
+        .withMessage("El RFC no puede estar vacío")
+        .isLength({ min: 13, max: 13 })
+        .withMessage("El RFC debe tener 13 caracteres")
+        .matches(/^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/)
+        .withMessage("El RFC debe ser válido"),
+    body("RFCOperador")
         .exists()
         .withMessage("El RFC es requerido")
         .notEmpty()
@@ -138,4 +147,3 @@ exports.validateRegisterOrdenante = [
         next(); // Continúa con el siguiente middleware o controlador si no hay errores
     },
 ];
-
