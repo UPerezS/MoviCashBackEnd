@@ -27,7 +27,7 @@ const PersonalSchema = new Schema({
     NombrePersonal: { type: String, required: true },
     ApPaterno: { type: String, required: true },
     ApMaterno: { type: String },
-    Sexo: { type: String, enum: ["M", "F"], required: true },
+    Sexo: { type: String, enum: ["M", "F", "Otro"], required: true },
     FechaNacimiento: { type: Date, required: true },
     CorreoElectronico: {
       type: String,

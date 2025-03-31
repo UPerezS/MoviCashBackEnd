@@ -1,5 +1,4 @@
 const { body, validationResult } = require('express-validator');
-const handleHttpError = require('../utils/handleHttpError');
 
 // Validaciones para el registro de ordenante
 exports.validateRegisterOrdenante = [
@@ -13,6 +12,7 @@ exports.validateRegisterOrdenante = [
         .withMessage("El RFC debe tener 13 caracteres")
         .matches(/^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/)
         .withMessage("El RFC debe ser válido"),
+
     // Validación del campo Nombre del ordenante
     body("NombreOrdenante")
         .exists()
@@ -39,7 +39,7 @@ exports.validateRegisterOrdenante = [
     body("Sexo")
         .exists()
         .withMessage("El sexo es requerido")
-        .notEmpty()
+        .notEmpty() 
         .withMessage("El campo sexo no puede estar vacío")
         .isIn(["M", "F"])
         .withMessage("Seleccione 'M' para Masculino, 'F' para Femenino"),
@@ -48,7 +48,7 @@ exports.validateRegisterOrdenante = [
     body("FechaNacimiento")
         .exists()
         .withMessage("La fecha de nacimiento es requerida")
-        .notEmpty()
+        .notEmpty() 
         .withMessage("La fecha de nacimiento no puede estar vacía")
         .isISO8601()
         .withMessage("La fecha de nacimiento debe estar en formato ISO"),
@@ -57,7 +57,7 @@ exports.validateRegisterOrdenante = [
     body("NumeroCuenta")
         .exists()
         .withMessage("El número de cuenta es obligatorio")
-        .notEmpty()
+        .notEmpty() 
         .withMessage("El número de cuenta no puede estar vacío"),
 
     // Validación para el saldo de la cuenta del ordenante
@@ -73,7 +73,7 @@ exports.validateRegisterOrdenante = [
     body("Telefono")
         .exists()
         .withMessage("El teléfono es requerido")
-        .notEmpty()
+        .notEmpty() 
         .withMessage("El campo teléfono no puede estar vacío")
         .isArray()
         .withMessage("Debe proporcionar al menos un número telefónico"),
@@ -124,7 +124,7 @@ exports.validateRegisterOrdenante = [
     body("FechaRegistro")
         .exists()
         .withMessage("La fecha de registro es requerida")
-        .notEmpty()
+        .notEmpty() 
         .withMessage("La fecha de registro no puede estar vacía")
         .isISO8601()
         .withMessage("La fecha de registro debe estar en formato ISO"),
@@ -138,4 +138,3 @@ exports.validateRegisterOrdenante = [
         next(); // Continúa con el siguiente middleware o controlador si no hay errores
     },
 ];
-
