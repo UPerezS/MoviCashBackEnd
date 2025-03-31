@@ -1,4 +1,4 @@
-const mongoose = require("mongoose"); // Asegúrate de importar mongoose
+const mongoose = require("mongoose");
 const Personal = require("../models/personal");
 const Transaccion = require("../models/transaccion");
 const Ordenante = require("../models/ordenante");
@@ -6,6 +6,56 @@ const { verifyToken } = require("../utils/handleJwt");
 const handleHttpError = require('../utils/handleHttpError');
 
 // * Filtro de usuarios
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({ message: "Token no proporcionado o formato incorrecto." });
+        }
+        const token = authHeader.split(" ")[1];
+
+        const dataToken = await verifyToken(token);
+        if (!dataToken || !dataToken._id) {
+            return res.status(401).json({ message: "Token inválido o usuario sin ID." });
+        }
+
+        const myId = mongoose.Types.ObjectId.isValid(dataToken._id)
+            ? new mongoose.Types.ObjectId(dataToken._id)
+            : null;
+
+        if (!myId) {
+            return res.status(400).json({ message: "ID de usuario no válido." });
+        }
+
+        const usuarios = await Personal.find({ 
+            _id: { $ne: myId }, 
+            Rol: { $in: ["Admin", "Operador"] } 
+        });
+
+        const ordenantes = await Ordenante.find();
+
+        if (!usuarios.length && !ordenantes.length) {
+            return res.status(404).json({
+                message: "No se encontraron usuarios con los criterios especificados."
+            });
+        }
+
+        return res.status(200).json({
+            message: "Usuarios y Ordenantes obtenidos correctamente.",
+            data: {
+                usuarios,
+                ordenantes
+            }
+        });
+
+    } catch (error) {
+        console.error("Error al obtener los usuarios y ordenantes:", error);
+        handleHttpError(res, "Error al obtener los usuarios y ordenantes", 500, error);
+    }
+};
+
+
 exports.filterUsers = async (req, res) => {
     try {
         const authHeader = req.headers.authorization;
