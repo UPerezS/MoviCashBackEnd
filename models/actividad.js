@@ -24,12 +24,12 @@
         Acciones:[{
           Accion: {
             type: String,
-            enum: ["Inicio de sesión", "Cierre de sesión", "Registro", "Eliminación", "Actualización"],
-            required: true,  // Asegúrate de que sea requerido
+            enum: ["Inicio de sesión", "Cierre de sesión", "Registro", "Eliminación", "Actualización","Cargar CSV"],
+            required: true,  
         },
         Detalles: {
             type: String,
-            required: true,  // Asegúrate de que sea requerido
+            required: true,  
         },
         Modificacion: {
           type: [
@@ -54,10 +54,9 @@
                     Numero: { type: String }
                     }
                   ],
-                  default: undefined, // Si no hay teléfono, no aparece el campo
+                  default: undefined,
                   validate: {
                       validator: function (arr) {
-                          // Solo acepta si algún teléfono tiene datos
                           return arr.length === 0 || arr.some(tel => tel.Lada || tel.Numero);
                       },
                       message: "El teléfono debe contener al menos un número válido."
@@ -85,10 +84,9 @@
                     Numero: { type: String }
                     }
                   ],
-                  default: undefined, // Si no hay teléfono, no aparece el campo
+                  default: undefined, 
                   validate: {
                       validator: function (arr) {
-                          // Solo acepta si algún teléfono tiene datos
                           return arr.length === 0 || arr.some(tel => tel.Lada || tel.Numero);
                       },
                       message: "El teléfono debe contener al menos un número válido."
@@ -102,8 +100,8 @@
         },
         Fecha: {
             type: Date,
-            default: Date.now,  // Default a la fecha actual si no se envía
-            required: true,  // Asegúrate de que sea requerido
+            default: Date.now,  
+            required: true, 
         },
         }],
       },
@@ -113,7 +111,6 @@
   );
   
   
-  //Crear y exportar modulo.
   const Actividad = mongoose.model("Actividad", ActividadSchema,"Actividad");
   
   module.exports = Actividad;

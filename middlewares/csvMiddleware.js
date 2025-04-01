@@ -5,13 +5,16 @@ const storage = multer.diskStorage({
     destination:(req,file,cb) => {
         cb(null,'uploads/');
     },
-    filename:(req,file,cb) => {
-        cb(null,Date.now() + '-' + file.originalname);
+    fileName:(req,file,cb) => {
+        cb(file.originalname);
+        const fileName =file.originalname;
+        req.fileName=fileName;
+        cb(null,fileName);
+        console.log(fileName);
     }
 });
 
 // Validación con Joi para el registro de ordenante
-
 exports.validateRegisterOrdenante1 = (ordenante) => {
     const schema = Joi.object({
       RFCOrdenante: Joi.string()
