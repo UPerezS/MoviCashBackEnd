@@ -25,11 +25,7 @@ const registerActivity = async (req, res) => {
         //return newAction;
     } catch(error) {
         console.error("Error en el registro: " + error.message);
-        if(Accion != "Cargar CSV"){
-            return res.status(500).json({"Error": error.message});
-        }else{
             throw new Error(error.message);
-        }
     }
 };
 
