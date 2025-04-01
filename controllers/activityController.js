@@ -17,10 +17,19 @@ const registerActivity = async (req, res) => {
             }
         );
 
-        return newAction;
+        if(Accion != "Cargar CSV"){
+            return res.status(200).json({"Success": newAction});
+        }else{
+            return newAction;
+        }
+        //return newAction;
     } catch(error) {
         console.error("Error en el registro: " + error.message);
-        throw new Error(error.message);
+        if(Accion != "Cargar CSV"){
+            return res.status(500).json({"Error": error.message});
+        }else{
+            throw new Error(error.message);
+        }
     }
 };
 
