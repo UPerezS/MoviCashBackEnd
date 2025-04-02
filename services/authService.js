@@ -1,4 +1,4 @@
-const VerificationCode = require('../models/VerificarCodigo');
+const VerificationCode = require('../models/verificarCodigo');
 const generarCodigo = require('../utils/handleCode');
 const { tokenSign } = require('../utils/handleJwt');
 
@@ -26,7 +26,7 @@ const verificarCodigo = async (userId, code) => {
 // Genera un token JWT para el usuario
 
 const generarToken = async (user) => {
-  return await tokenSign(user);
+  return tokenSign(user);
 };
 
 module.exports = { generarCodigoVerificacion, verificarCodigo, generarToken };

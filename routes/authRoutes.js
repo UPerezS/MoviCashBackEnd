@@ -12,6 +12,8 @@ const {
 const authController = require("../controllers/authController");
 const authMiddleware = require("../middlewares/authMiddleware");
 
+router.get('/infoPersonal', authMiddleware, authController.obtenerNombreUsuario);
+
 // Ruta para registrar un usuario
 router.post("/registrar", validateRegister, authController.registrar);
 

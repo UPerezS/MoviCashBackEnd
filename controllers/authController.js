@@ -102,6 +102,16 @@ exports.verificarCodigoYGenerarToken = async (req, res) => {
   }
 };
 
+exports.obtenerNombreUsuario = async (req, res) => {
+  try{
+    const userId = req.user._id;
+    const user = await userService.obtenerInfoPersonal(userId);
+    res.status(200).json({message: 'Nombre del usuario exitoso', nombreUsuario: user});
+  }catch(error){
+    handleHttpError(res, 'Error al Obtener la Información', 500, error);
+  }
+}
+
 // Recuperar contraseña
 exports.recoverPassword = async (req, res) => {
   try {

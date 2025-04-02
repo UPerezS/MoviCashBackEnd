@@ -41,3 +41,13 @@ exports.updateUserPassword = async (email, newPassword) => {
       throw new Error("Error al actualizar la contraseña: " + error.message);
     }
   };
+
+  exports.obtenerInfoPersonal = async(userId) => {
+    try{
+      const nombreUsuario = await Personal.find({_id: {$eq: userId}},{_id:0, NombrePersonal:1});
+      console.log(nombreUsuario);
+      return nombreUsuario;
+    }catch(error){
+      throw new Error("Error en obtener el nombre del usuario"+ error.message);
+    }
+  }
