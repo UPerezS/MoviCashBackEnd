@@ -68,16 +68,18 @@ exports.verificarTokenTransaccion = async (req, res, next) => {
   }
 };
 
-// Verificar que es un operador
+
+// Verificar que es un operador o admin
 exports.esOperadorTransaccion = (req, res, next) => {
-  if (req.user && req.user.Rol === 'Operador') {
+  if (req.user && (req.user.Rol === 'Operador' || req.user.Rol === 'Admin')) {
     return next();
   }
   return res.status(403).json({ 
     success: false,
-    error: 'Acceso denegado. Se requiere rol de operador para gestionar transacciones' 
+    error: 'Acceso denegado. Se requiere rol de operador o administrador' 
   });
 };
+
 
 // Validación de datos de transacción
 exports.validarDatosTransaccion = (req, res, next) => {
