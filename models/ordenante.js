@@ -1,97 +1,92 @@
-const mongoose = require('mongoose');
-const {Schema} =mongoose;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const OrdenanteSchema = new Schema({
     RFCOrdenante: {
-        type:String,
-        required:false,
-        unique:false,
-        match:/^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/
-    },
-    NombreOrdenante: {
-        type:String,
-        required:false
-    },
-    ApPaterno: {
-        type:String,
-        required:false
-    },
-    ApMaterno: {
-        type:String
-    },
-    Sexo: {
-        type:String,
-        required:false,
-        enum:['M','F']
-    },
-    FechaNacimiento: {
-        type:Date,
-        required:false
-    },
-    NumeroCuenta: {
-        type:String,
-        required:false
-    },
-    Saldo: {
-        type:Number,
-        required:false
-    },
-    Estado: {
-        type:String,
-        required:false,
-        enum:['Activo','Inactivo'],
-        default:'Activo'
-    },
-    FechaRegistro: {
-        type:Date,
-        required:false
+        type: String,
+        required: true,
+        unique: true,
+        match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/
     },
     RFCOperador: {
-        type:String,
-        required:false
+        type: String,
+        required: true,
+        match: /^[A-ZÑ&]{3,4}\d{6}[A-Z\d]{3}$/
+    },
+    NombreOrdenante: {
+        type: String,
+        required: true
+    },
+    ApPaterno: {
+        type: String,
+        required: true
+    },
+    ApMaterno: {
+        type: String,
+        default: null
+    },
+    Sexo: {
+        type: String,
+        required: true,
+        enum: ['M', 'F']
+    },
+    FechaNacimiento: {
+        type: Date,
+        required: true
+    },
+    NumeroCuenta: {
+        type: String,
+        required: true
+    },
+    Saldo: {
+        type: Number,
+        required: true,
+        min: 0 
+    },
+    Estado: {
+        type: String,
+        required: true,
+        enum: ['Activo', 'Inactivo', 'Bloqueado'],
+        default: 'Inactivo'
     },
     Telefono: {
-        type:[{
-            Lada: {
-                type:String,
-                required:false,
-                match:/^\d{2,3}$/
+        type: [String],
+        required: true,
+        validate: {
+            validator: function (v) {
+                return v.length > 0 && v.every(num => /^\d{7,10}$/.test(num));
             },
-            Numero: {
-                type:String,
-                required:false,
-                match:/^\d{7,10}$/
-            }
-        }],
-        required:false,
-        validate:[v=>v.length>0,'Debe tener al menos un teléfono']
-    },
-    Direccion: {
-        NumeroInterior: {
-            type:String,
-            required:false
-        },
-        NumeroExterior: {
-            type:String,
-            required:false
-        },
-        Calle: {
-            type:String,
-            required:false
-        },
-        Colonia: {
-            type:String,
-            required:false
-        },
-        Ciudad: {
-            type:String,
-            required:false
+            message: "Debe proporcionar al menos un número telefónico válido de 7 a 10 dígitos"
         }
     },
-    FechaUltimaModificacion: {
-        type:Date,
-        required:false
-    },
+    Direccion: {
+        NumeroExterior: {
+            type: String,
+            required: true
+        },
+        NumeroInterior: {
+            type: String,
+            default: null
+        },
+        Calle: {
+            type: String,
+            required: true
+        },
+        Colonia: {
+            type: String,
+            required: true
+        },
+        Ciudad: {
+            type: String,
+            required: true
+        }
+    }
+}, 
+{
+    timestamps: { 
+        createdAt: 'FechaRegistro', 
+        updatedAt: 'FechaUltimaModificacion' 
+    }
 });
 
 const Ordenante = mongoose.model('Ordenante', OrdenanteSchema, "Ordenante");

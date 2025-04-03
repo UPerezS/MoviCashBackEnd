@@ -1,13 +1,12 @@
 require("dotenv").config(); // Cargar variables de entorno
 
-
 const app = require('./index.js'); // Importación de la app express
 const conectarDB = require('./config/mongo.js'); // Importación de la conexión de la BD
 
 // Conectar a la base de datos
 conectarDB();
 
-const PORT = process.env.PORT || 8090;
+const PORT = process.env.PORT || 3000;
 
 
 app.listen(PORT, () => {

@@ -1,112 +1,146 @@
 const Ordenante = require("../models/ordenante");
+const { matchedData } = require("express-validator");
+const OrdenanteService = require('../services/ordenanteService');
+const handleHttpError = require('../utils/handleHttpError');
 
-// Obtener todos los ordenantes
+
+exports.getOrdenanteByRFC = async (req, res) => {
+    const { RFCOrdenante } = req.params;
+
+    try {
+        const ordenante = await Ordenante.findOne({ RFCOrdenante });
+
+        if (!ordenante) {
+            return res.status(404).json({ message: "Ordenante no encontrado." });
+        }
+
+        return res.status(200).json({ message: "Ordenante encontrado.", ordenante });
+
+    } catch (error) {
+        handleHttpError(res, "Error al Obtener el Ordenante por RFC", 500, error);
+    }
+}
+
+exports.getOrdenanteByApellido = async (req, res) => {
+    try {
+        const { ApPaterno } = req.params;
+
+        // Apellido exacto
+        const ordenantes = await Ordenante.find({ ApPaterno });
+
+        if (!ordenantes || ordenantes.length === 0) {
+            return res.status(404).json({ message: "No se encontró información para el apellido ingresado." });
+        }
+
+        return res.status(200).json({ message: "Ordenante(s) encontrado(s).", ordenantes });
+
+    } catch (error) {
+        console.error("Error al obtener el ordenante: ", error);
+        handleHttpError(res, "Error al Obtener el Ordenante por Apellido", 500, error);
+    }
+};
+
 exports.getAllOrdenantes = async (req, res) => {
     try {
-        const ordenantes = await Ordenante.find({ Rol: "Ordenante" });
-        
+        const ordenantes = await Ordenante.find();
+
         if (ordenantes.length === 0) {
             return res.status(404).json({ message: "No se encontraron ordenantes." });
         }
 
-        res.status(200).json({ message: "Ordenantes encontrados.", data: ordenantes });
+        return res.status(200).json({ message: "Ordenantes encontrados.", ordenantes });
     } catch (error) {
-        // En caso de error en la consulta, se captura y responde con error 500
         console.error("Error al obtener los ordenantes: ", error);
-        res.status(500).json({ message: "Error interno del servidor." });
+        handleHttpError(res, "Error al Obtener Todos los Ordenantes", 500, error);
     }
 };
 
-// Eliminar un ordenante
-exports.deleteOrdenante = async (req, res) => {
-    const { RFCOrdenante } = req.params;  // Obtenemos el RFC del ordenante desde los parámetros de la ruta
-    
+exports.createOrdenante = async (req, res) => {
     try {
-        const ordenante = await Ordenante.findOne({ RFCOrdenante }, { Rol: 1 });
-        
+
+        const userId = req.user._id;
+        const body = matchedData(req); // Obtener los datos del cuerpo de la solicitud
+        console.log(userId);
+
+        const nuevoOrdenante = await OrdenanteService.createOrdenante(userId, body);
+
+        // const nuevoOrdenante = new Ordenante(body);
+        // await nuevoOrdenante.save();
+
+        console.log("Ordenante creado con éxito.");
+        res.status(201).json({ message: "Ordenante creado con éxito.", nuevoOrdenante });
+
+    } catch (error) {
+        console.error("Error al crear el ordenante:", error);
+        handleHttpError(res, "Error al Crear el Ordenante", 500, error);
+        console.log()
+    }
+};
+
+exports.deleteOrdenante = async (req, res) => {
+    const { RFCOrdenante } = req.params;
+
+    try {
+        const ordenante = await Ordenante.findOne({ RFCOrdenante });
+
         if (!ordenante) {
             return res.status(404).json({ message: "Ordenante no encontrado." });
         }
 
-        // Si el ordenante es válido y tiene el rol "Ordenante", se procede a eliminarlo
-        if (ordenante.Rol === "Ordenante") {
-            await Ordenante.deleteOne({ RFCOrdenante });
-            res.status(200).json({ message: "Ordenante eliminado con éxito." });
-        } else {
-            console.error("No es ordenante.");
-            res.status(403).json({ message: "No es ordenante." });
-        }
+        await Ordenante.deleteOne({ RFCOrdenante });
+        return res.status(200).json({ message: "Ordenante eliminado con éxito.", ordenante });
+
     } catch (error) {
         console.error("Error al eliminar el ordenante: ", error);
-        res.status(500).json({ message: "Error interno del servidor." });
+        handleHttpError(res, "Error al Eliminar el Ordenante", 500, error);
     }
 };
 
-// Actualizar datos de un ordenante
+
 exports.updateOrdenante = async (req, res) => {
-    const { RFCOrdenante } = req.params;  // Obtenemos el RFC del ordenante desde los parámetros de la ruta
-    
+    const { RFCOrdenante } = req.params;
+    const ordenanteData = req.body;
+
     try {
-        const ordenante = await Ordenante.findOne({ RFCOrdenante }, { Rol: 1 });
+        const result = await OrdenanteService.updateOrdenante(RFCOrdenante, ordenanteData);
 
-        if (!ordenante) {
-            return res.status(404).json({ message: "Ordenante no encontrado." });
+        if (result.error) {
+            return res.status(result.statusCode).json({ message: result.message });
         }
 
-        if (ordenante.Rol === "Ordenante") {
-            // Extraemos los datos a actualizar desde el cuerpo de la solicitud
-            const {
-                RFCOrdenante, 
-                NombreOrdenante,
-                ApPaterno,
-                ApMaterno,
-                Sexo,
-                FechaNacimiento,
-                NumeroCuenta,
-                Saldo,
-                Estado,
-                FechaRegistro,
-                RFCOperador,
-                Telefono,
-                Direccion
-            } = req.body;
+        return res.status(200).json({ message: "Ordenante actualizado correctamente.", result });
 
-            // Actualizamos el documento con los nuevos valores
-            await Ordenante.updateOne(
-                { RFCOrdenante }, 
-                { 
-                    $set: {
-                        "NombreOrdenante": NombreOrdenante,
-                        "ApPaterno": ApPaterno,
-                        "ApMaterno": ApMaterno,
-                        "Sexo": Sexo,
-                        "FechaNacimiento": new Date(FechaNacimiento), // Convertimos la fecha a formato Date
-                        "Direccion": {
-                            "NumeroInterior": NumeroInterior,
-                            "NumeroExterior": NumeroExterior,
-                            "Calle": Calle,
-                            "Colonia": Colonia,
-                            "Ciudad": Ciudad
-                        },
-                        "Telefono": [
-                            {
-                                "Lada": Lada,
-                                "Numero": Numero
-                            }
-                        ],
-                        "Estado": Estado,
-                        "FechaUltimaModificacion": new Date() 
-                    }
-                }
-            );
-
-            res.status(200).json({ message: "Ordenante actualizado con éxito." });
-        } else {
-            console.error("No es ordenante.");
-            res.status(403).json({ message: "no es ordenante." });
-        }
     } catch (error) {
-        console.log("Error al actualizar ordenante: ", error);
-        res.status(500).json({ message: "Error interno del servidor." });
+        console.error("Error al actualizar el ordenante: ", error);
+        handleHttpError(res, "Error al actualizar el Ordenante", 500, error);
     }
 };
+
+
+//Actulizar el estado del ordenante 
+    exports.updateEstadoOrdenante = async (req, res) => {
+        const { RFCOrdenante } = req.params;
+        const { Estado } = req.body;
+
+        try {
+            const ordenante = await Ordenante.findOne({RFCOrdenante });
+            if (!ordenante) {return res.status(404).json({ error: 'Ordenante no encontrado.' });
+            }
+            
+            if (ordenante.Estado === Estado) {
+                return res.status(400).json({ error: `El estado ya está actulizado a: "${Estado}".` });
+              }
+            
+              ordenante.Estado = Estado;
+              await ordenante.save();
+          
+              res.status(200).json({
+                message: `Estado del ordenante actualizado a "${Estado}".`,
+                data: ordenante
+              });
+
+            } catch (error) {
+                console.error('Error al actualizar el estado del ordenante:', error.message);
+                handleHttpError(res, 'Error de actualizar ordenante', 500, error.message);
+              }
+            };

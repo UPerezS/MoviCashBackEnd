@@ -16,16 +16,14 @@ exports.registerUser = async (userData) => {
         const newUsuario = new Personal(userData);
         return await newUsuario.save();
     } catch (error) {
-        throw new Error(`Error al registrar ${userData.Rol}: ` + error.message);
+        throw error;
     }
 };
 
 // Obtener un usuario por correo electrónico
 exports.getUserByEmail = async (email) => {
 
-    const user = await Personal.findOne({
-      CorreoElectronico: { $regex: new RegExp("^" + email.trim() + "$", "i") } //Ignora mayúsculas/minúsculas
-    });
+    const user = await Personal.findOne({ CorreoElectronico: { $eq: email }});
   
     return user;
   };
@@ -43,3 +41,13 @@ exports.updateUserPassword = async (email, newPassword) => {
       throw new Error("Error al actualizar la contraseña: " + error.message);
     }
   };
+
+  exports.obtenerInfoPersonal = async(userId) => {
+    try{
+      const nombreUsuario = await Personal.find({_id: {$eq: userId}},{_id:0, NombrePersonal:1});
+      console.log(nombreUsuario);
+      return nombreUsuario;
+    }catch(error){
+      throw new Error("Error en obtener el nombre del usuario"+ error.message);
+    }
+  }

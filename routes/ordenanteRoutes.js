@@ -1,15 +1,29 @@
 const express = require('express');
 const router = express.Router();
-const { validateRegisterOrdenante } = require('../middlewares/ordenanteMiddleware');
 // Se importa el controlador para poder tener acceso a sus metodos
-const operadorController = require("../controllers/ordenanteController")
+const ordenanteController = require("../controllers/ordenanteController");
+const { validateRegisterOrdenante } = require("../middlewares/ordenanteMiddleware");
+const authMiddleware = require('../middlewares/authMiddleware');
+const { validateRegisterOrdenante1 } = require("../middlewares/ordenanteMiddleware");
+const csvController = require("../controllers/csvController");
+const uploadCsv = require("../middlewares/csvMiddleware");
+const csvService = require("../services/csvService");
 
-router.post("/createOrdenante", validateRegisterOrdenante, operadorController.createOrdenante);
 
-router.get("/getAllOrdenantes", operadorController.getAllOrdenantes);
+router.get("/getAllOrdenantes", ordenanteController.getAllOrdenantes);
 
-router.delete("/deleteOrdenante/:RFCOrdenante", operadorController.deleteOrdenante);
+router.get("/getOrdenanteByRFC/:RFCOrdenante", ordenanteController.getOrdenanteByRFC);
 
-router.put("/updateOrdenante/:RFCOrdenante", operadorController.updateOrdenante);
+router.get("/getOrdenanteByApellido/:ApPaterno", ordenanteController.getOrdenanteByApellido);
+
+router.delete("/deleteOrdenante/:RFCOrdenante", ordenanteController.deleteOrdenante);
+
+router.post("/createOrdenante", authMiddleware, validateRegisterOrdenante ,ordenanteController.createOrdenante);
+
+router.put("/updateOrdenante/:RFCOrdenante", ordenanteController.updateOrdenante);
+
+router.patch('/ordenantes/:RFCOrdenante/estado', ordenanteController.updateEstadoOrdenante);
+
+router.post('/bulkOrdenante', uploadCsv.upload,csvService.validateCSVFile,csvController.insertBulk);
 
 module.exports = router;

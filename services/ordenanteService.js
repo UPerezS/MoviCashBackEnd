@@ -1,8 +1,73 @@
 const Ordenante = require('../models/ordenante');
+const mongoose = require("mongoose");
+const Personal = require("../models/personal");
 
 // Obtener ordenante por el RFC
+exports.getOrdenanteByRFC = async (RFCOrdenante) => {
+    try {
+        const ordenante = await Ordenante.findOne({ RFCOrdenante });
+        if (!ordenante) {
+            return { message: "Ordenante no encontrado." };
+        }
+        return { message: "Ordenante encontrado.", data: ordenante };
+    } catch (error) {
+        console.error("Error al obtener el ordenante: ", error);
+        return error;
+    }
+};
 
-exports.getOrdenanteByRFC = async (req, res) => {
+// Obtener ordenante por el Apellido
+exports.getOrdenanteByApellido = async (ApPaterno) => {
+    try {
+        const ordenante = await Ordenante.find({ ApPaterno });
+        if (!ordenante) {
+            return { message: "Ordenante no encontrado." };
+        }
+        return { message: "Ordenante(s) encontrado(s).", data: ordenante };
+    } catch (error) {
+        console.error("Error al obtener el ordenante: ", error);
+        return error;
+    }
+}
+
+// Obtener todos los ordenantes
+exports.getAllOrdenantes = async () => {
+    try {
+        const ordenantes = await Ordenante.find();
+        if (ordenantes.length === 0) {
+            return { message: "No se encontraron ordenantes." };
+        }
+        return { message: "Ordenantes encontrados.", data: ordenantes };
+    } catch (error) {
+        console.error("Error al obtener los ordenantes: ", error);
+        return error;
+    }
+};
+
+// Crear un nuevo ordenante
+exports.createOrdenante = async (userId,ordenanteData) => {
+    try {
+        console.log(userId);
+
+        const operador = await Personal.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+
+        if (!operador) {
+            return { error: "Operador no encontrado." };
+        }
+
+        ordenanteData.RFCOperador = operador.RFC;
+
+        const newOrdenante = new Ordenante(ordenanteData);
+        await newOrdenante.save();
+        return { message: "Ordenante creado con éxito.", data: newOrdenante };
+    } catch (error) {
+        console.error("Error al crear el ordenante: ", error);
+        throw new Error("Error al crear el ordenante: " + error.message); 
+    }
+};
+
+// Eliminar un ordenante
+exports.deleteOrdenante = async (req, res) => {
     const { RFCOrdenante } = req.params;
 
     try {
@@ -12,123 +77,38 @@ exports.getOrdenanteByRFC = async (req, res) => {
             return res.status(404).json({ message: "Ordenante no encontrado." });
         }
 
-        res.status(200).json({ message: "Ordenante encontrado.", data: ordenante });
-    } catch (error) {
-        console.error("Error al obtener el ordenante: ", error);
-        res.status(500).json({ message: "Error interno del servidor." });
-    }
-}
+        await Ordenante.deleteOne({ RFCOrdenante });
+        return res.status(200).json({ message: "Ordenante eliminado correctamente." });
 
-// Obtener ordenante por el nombre
-
-exports.getOrdenanteByName = async (req, res) => {
-    const { NombreOrdenante } = req.params;
-
-    try {
-        const ordenante = await Ordenante.findOne({ NombreOrdenante });
-
-        if (!ordenante) {
-            return res.status(404).json({ message: "Ordenante no encontrado." });
-        }
-
-        res.status(200).json({ message: "Ordenante encontrado.", data: ordenante });
-    } catch (error) {
-        console.error("Error al obtener el ordenante: ", error);
-        res.status(500).json({ message: "Error interno del servidor." });
-    }
-}
-
-// Obtener todos los ordenantes
-
-exports.getAllOrdenantes = async (req, res) => {
-    try {
-        const ordenantes = await Ordenante.find({ Rol: "Ordenante" });
-
-        if (ordenantes.length === 0) {
-            return res.status(404).json({ message: "No se encontraron ordenantes." });
-        }
-
-        res.status(200).json({ message: "Ordenantes encontrados.", data: ordenantes });
-    } catch (error) {
-        console.error("Error al obtener los ordenantes: ", error);
-        res.status(500).json({ message: "Error interno del servidor." });
-    }
-}
-
-// Crear un nuevo ordenante
-
-exports.createOrdenante = async (req, res) => {
-    const ordenanteData = req.body;
-
-    try {
-        const newOrdenante = new Ordenante(ordenanteData);
-        await newOrdenante.save();
-
-        res.status(201).json({ message: "Ordenante creado con éxito.", data: newOrdenante });
-    } catch (error) {
-        console.error("Error al crear el ordenante: ", error);
-        res.status(500).json({ message: "Error interno del servidor." });
-    }
-};
-
-// Eliminar un ordenante
-
-exports.deleteOrdenante = async (req, res) => {
-    const { RFCOrdenante } = req.params;
-
-    try {
-        const ordenante = await Ordenante.findOne({ RFCOrdenante }, { Rol: 1 });
-
-        if (!ordenante) {
-            return res.status(404).json({ message: "Ordenante no encontrado." });
-        }
-
-        if (ordenante.Rol === "Ordenante") {
-            await Ordenante.deleteOne({ RFCOrdenante });
-            res.status(200).json({ message: "Ordenante eliminado con éxito." });
-        } else {
-            console.error("No es ordenante.");
-            res.status(403).json({ message: "No es ordenante." });
-        }
     } catch (error) {
         console.error("Error al eliminar el ordenante: ", error);
-        res.status(500).json({ message: "Error interno del servidor." });
+        return error;
     }
 };
 
-// Actualizar datos de un ordenante
 
-exports.updateOrdenante = async (req, res) => {
-    const { RFCOrdenante } = req.params;
-
+exports.updateOrdenante = async (RFCOrdenante, ordenanteData) => {
     try {
-        const ordenante = await Ordenante.findOne({ RFCOrdenante }, { Rol: 1 });
-
+        // Verificar si el ordenante existe
+        const ordenante = await Ordenante.findOne({ RFCOrdenante });
         if (!ordenante) {
-            return res.status(404).json({ message: "Ordenante no encontrado." });
+            return { error: true, message: "Ordenante no encontrado." };
         }
 
-        if (ordenante.Rol === "Ordenante") {
-            const ordenanteData = req.body;
-            await Ordenante.updateOne({ RFCOrdenante }, ordenanteData);
-            res.status(200).json({ message: "Ordenante actualizado con éxito." });
-        } else {
-            console.error("No es ordenante.");
-            res.status(403).json({ message: "No es ordenante." });
+        if (ordenanteData.Saldo !== undefined) {
+            ordenanteData.Saldo = mongoose.Types.Decimal128.fromString(ordenanteData.Saldo.toString());
         }
+
+        const updatedOrdenante = await Ordenante.findOneAndUpdate(
+            { RFCOrdenante },
+            { $set: ordenanteData },
+            { new: true, runValidators: true, context: 'query' }
+        );
+
+        return { message: "Ordenante actualizado correctamente.", updatedOrdenante };
+
     } catch (error) {
-        console.error("Error al actualizar el ordenante: ", error);
-        res.status(500).json({ message: "Error interno del servidor." });
+        console.error("Error al actualizar el ordenante:", error);
+        return error;
     }
 };
-
-// Exportar los métodos del controlador
-
-module.exports = {
-    getOrdenanteByRFC,
-    getOrdenanteByName,
-    getAllOrdenantes,
-    createOrdenante,
-    deleteOrdenante,
-    updateOrdenante
-};  // Se exportan los métodos para poder ser utilizados en las rutas
