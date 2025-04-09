@@ -44,7 +44,7 @@ exports.updateUserPassword = async (email, newPassword) => {
 
   exports.obtenerInfoPersonal = async(userId) => {
     try{
-      const nombreUsuario = await Personal.find({_id: {$eq: userId}},{_id:0, NombrePersonal:1});
+      const nombreUsuario = await Personal.find({_id: {$eq: userId}},{_id:0, NombrePersonal:1, RFC:1});
       console.log(nombreUsuario);
       return nombreUsuario;
     }catch(error){
